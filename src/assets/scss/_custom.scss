@@ -1,0 +1,36 @@
+.p-card-content {
+  padding: 0.6rem 0.5rem !important;
+}
+
+.p-card .p-card-body {
+  width: 100%;
+}
+
+.pointer {
+  cursor: pointer;
+}
+
+.big-button {
+  padding: 0.6rem 0.8rem;
+  font-size: 1rem;
+  font-weight: 500;
+  text-align: center;
+  min-width: 12rem;
+  border-radius: 0px;
+  background-color: rgb(52, 58, 64) !important;
+  border-color: rgb(52, 58, 64) !important;
+  color: #fff;
+
+  &:hover {
+    background-color: #23272b !important;
+    border-color: #23272b !important;
+  }
+
+  &:enabled:focus {
+    box-shadow: 0 0 0 0.2rem #beccd2;
+  }
+
+  &:focus:not(:focus-visible) {
+    outline: 0;
+  }
+}

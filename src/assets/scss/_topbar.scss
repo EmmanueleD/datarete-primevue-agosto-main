@@ -1,0 +1,38 @@
+.topbar {
+  background-color: #fff;
+  padding         : 0 .8rem;
+  height          : 50px;
+  position        : fixed;
+  top             : 0;
+  right           : 0;
+  width           : 100%;
+  transition      : width 0.4s ease-out;
+  z-index         : 1002;
+
+  .p-button.p-button-text.p-button-plain {
+    color: #fff;
+
+    &:enabled:hover {
+      background: none;
+      color     : #ddd;
+    }
+
+    &:focus {
+      box-shadow: none;
+    }
+
+    &:focus-visible {
+      box-shadow: 0 0 0 1px #a2d5fc;
+    }
+  }
+}
+
+@media (min-width: $desktopBreakpoint) {
+  .topbar {
+    width: calc(100% - #{$sidebarWidth});
+
+    .desktop-hidden-sidebar & {
+      width: 100%;
+    }
+  }
+}

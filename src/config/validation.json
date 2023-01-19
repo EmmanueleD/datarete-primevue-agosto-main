@@ -1,0 +1,166 @@
+{
+ "faq": [
+  {
+   "name": "Question",
+   "key": "question",
+   "type": "Object"
+  },
+  {
+   "name": "Answer",
+   "key": "answer",
+   "type": "Object"
+  }
+ ],
+ "backoffice" : [
+  {
+   "name": "Name",
+   "key": "nome",
+   "type": "String"
+  },
+  {
+   "name": "Surname",
+   "key": "cognome",
+   "type": "String"
+  },
+  {
+   "name": "Email",
+   "key": "email",
+   "type": "String"
+  },
+  {
+   "name": "Role type",
+   "key": "role",
+   "type": ""
+  },
+  {
+   "name": "Company",
+   "key": "companies",
+   "type": "Array"
+  }
+ ],
+ "company": [
+  {
+   "name": "Ragione sociale",
+   "key": "ragione_sociale",
+   "type": "String"
+  }
+ ],
+ "role": [
+  {
+   "name": "Name",
+   "key": "nome",
+   "type": "String"
+  },
+  {
+   "name": "Company",
+   "key": "id_company",
+   "type": ""
+  }
+ ],
+ "user": [
+  {
+   "name": "Name",
+   "key": "nome",
+   "type": "String"
+  },
+  {
+   "name": "Cognome",
+   "key": "cognome",
+   "type": "String"
+  },
+  {
+   "name": "Email",
+   "key": "email",
+   "type": "String"
+  },
+  {
+   "name": "Company",
+   "key": "id_company",
+   "type": ""
+  }
+ ],
+ "campaign": [
+  {
+   "name": "Company",
+   "key": "id_company",
+   "type": ""
+  },
+  {
+   "name": "Title",
+   "key": "title",
+   "type": "Object"
+  },
+  {
+   "name": "Start",
+   "key": "data_inizio",
+   "type": "String"
+  },
+  {
+   "name": "End",
+   "key": "data_fine",
+   "type": "String"
+  }
+ ],
+ "kpi": [
+  {
+   "name": "Friendly name",
+   "key": "friendly_name",
+   "type": "Object"
+  },
+  {
+   "name": "Real name",
+   "key": "name",
+   "type": "String"
+  },
+  {
+   "name": "Default goal",
+   "key": "default_goal",
+   "type": "PositiveNumber"
+  },
+  {
+   "name": "Action divider",
+   "key": "divisore_azione",
+   "type": "PositiveNumber"
+  }
+ ],
+ "learning_section": [
+  {
+   "name": "Name",
+   "key": "name",
+   "type": "Object"
+  }
+ ],
+ "learning_chapter": [
+  {
+   "name": "Title",
+   "key": "title",
+   "type": "Object"
+  }
+ ],
+ "learning_quiz": [
+  {
+   "name": "Question",
+   "key": "question",
+   "type": "Object"
+  }
+ ],
+ "badge": [
+  {
+   "name": "Title",
+   "key": "title",
+   "type": "Object"
+  }
+ ],
+ "award": [
+  {
+   "name": "Title",
+   "key": "title",
+   "type": "Object"
+  },
+  {
+   "name": "Badge selection",
+   "key": "lista_badge",
+   "type": "Array"
+  }
+ ]
+}

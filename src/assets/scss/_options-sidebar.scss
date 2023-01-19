@@ -1,0 +1,51 @@
+.options-sidebar {
+    width              : $optionsSidebarWidth;
+    height             : calc(100% - 50px);
+    background-color   : #FFF;
+    position           : fixed;
+    top                : 0;
+    right              : -$optionsSidebarWidth;
+    margin-top         : 50px;
+    transition         : right .3s ease-in-out;
+    z-index            : 800;
+    overflow           : hidden;
+    overflow-y         : auto;
+    box-shadow         : 0 0px 8px 0 rgba(0, 0, 0, 0.4);
+    padding            : 2rem 1rem;
+    visibility         : visible;
+    animation          : visibility-delay .1s;
+    animation-delay    : 1s;
+    animation-fill-mode: forwards;
+
+    &.show {
+        animation : none;
+        visibility: visible;
+        right     : 0;
+    }
+}
+
+.avatar-container{
+  position: relative;
+}
+
+.custom-file-input{
+  display: none;
+}
+
+.custom-file-input-label{
+  background-color: #c1c2c3;
+  color: white;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-content: center;
+  cursor: pointer;
+  position: absolute;
+  bottom: 0;
+  right: -12px;
+}
+
+p-sidebar{
+  padding-bottom: 300px;
+}

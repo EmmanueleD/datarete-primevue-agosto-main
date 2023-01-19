@@ -1,0 +1,22 @@
+.elenco-sale {
+  height: calc(100vh - 200px);
+  overflow-y: scroll;
+}
+
+.card-calendario {
+  height: calc(100vh - 230px);
+  overflow-y: scroll;
+}
+
+.sala {
+  .p-image {
+    img {
+      width: 100%;
+    }
+  }
+}
+.sala:hover {
+  box-shadow: 0px 1px 10px rgba(0, 0, 0, 0.12), 0px 4px 5px rgba(0, 0, 0, 0.14),
+    0px 2px 4px -1px rgba(0, 0, 0, 0.2);
+  background-color: rgb(253, 255, 255);
+}
