@@ -1,64 +1,295 @@
 <template>
+  <Toast></Toast>
   <div class="wrapper">
     <h1>Nuovo Mutuo</h1>
 
     <Card>
       <template #content>
         <div class="grid">
-          <div class="col-12 flex justify-content-between flex-wrap">
-            <div class="flex flex-column  mb-4 col">
-              <label>Tipo</label>
-              <InputText type="text" placeholder="Tipo operazione" v-model="tmpItem.tipoOperazione"></InputText>
+          <div class="col-12 flex justify-content-start flex-wrap pt-4">
+            <div class="col-12 col-md-4 flex flex-column mb-4">
+              <label>Agente</label>
+              <div v-if="loadingUtentiOptions" class="w-full pt-4">
+                <Skeleton></Skeleton>
+              </div>
+              <Dropdown
+                v-else
+                :filter="true"
+                v-model="pratica.idAgente"
+                :options="utentiOptions"
+                optionLabel="text"
+                optionValue="value"
+              ></Dropdown>
             </div>
+            <div class="col-12 col-md-4 flex flex-column mb-4">
+              <label>Collega</label>
+              <div v-if="loadingUtentiOptions" class="w-full pt-4">
+                <Skeleton></Skeleton>
+              </div>
+              <Dropdown
+                v-else
+                :filter="true"
+                v-model="pratica.idAgenteCollega"
+                :options="utentiOptions"
+                optionLabel="text"
+                optionValue="value"
+              ></Dropdown>
+            </div>
+            <div class="col-12 col-md-2 flex flex-column mb-4">
+              <label>% collega</label>
+              <InputNumber
+                v-model="pratica.percentualeCollega"
+                :min-fraction-digits="0"
+                :max-fraction-digits="2"
+              ></InputNumber>
+            </div>
+          </div>
 
-            <div class="flex flex-column  mb-4 col">
+          <Divider class="my-4"></Divider>
+
+          <div class="col-12">
+            <h4>Prodotto</h4>
+          </div>
+          <div class="col-12 col-md-8">
+            <div class="flex flex-column mb-4 col">
               <label>Prodotto</label>
-              <InputText type="text" placeholder="Tipo operazione" v-model="tmpItem.prodotto"></InputText>
+              <InputText type="text" v-model="pratica.descrizioneProdotto">
+              </InputText>
             </div>
-
-            <div class="flex flex-column  mb-4 col">
+          </div>
+          <div class="col-12 col-md-4">
+            <div class="flex flex-column mb-4 col">
               <label>Istituto</label>
-              <InputText type="text" placeholder="Tipo operazione" v-model="tmpItem.istituto"></InputText>
+              <InputText type="text" v-model="pratica.istitutoFinanziatore">
+              </InputText>
             </div>
           </div>
 
           <div class="col-12 flex justify-content-between flex-wrap">
-            <div class="flex col  flex-column  mb-4">
+            <div class="flex col flex-column mb-4">
+              <label>Motivo del finanziamento</label>
+              <InputText
+                type="text"
+                v-model="pratica.motivoFinanzimento"
+              ></InputText>
+            </div>
+
+            <div class="flex col flex-column mb-4">
+              <label>Importo richiesto</label>
+              <InputNumber v-model="pratica.importo"></InputNumber>
+            </div>
+
+            <div class="flex col flex-column mb-4">
+              <label>Importo finanziato</label>
+              <InputNumber v-model="pratica.importoErogato"></InputNumber>
+            </div>
+
+            <div class="flex col flex-column mb-4">
+              <label>Tipo di Tasso</label>
+              <InputText type="text" v-model="pratica.tipoTasso"></InputText>
+            </div>
+
+            <div class="flex col flex-column mb-4">
+              <label>Tasso finito</label>
+              <InputNumber v-model="pratica.tassoFinito"></InputNumber>
+            </div>
+
+            <div class="flex col flex-column mb-4">
+              <label>Intermediazione (%)</label>
+              <InputNumber
+                :min-fraction-digits="0"
+                :max-fraction-digits="2"
+                v-model="pratica.percentualeMediazione"
+              ></InputNumber>
+            </div>
+
+            <div class="flex col flex-column mb-4">
+              <label>Assicurazione</label>
+              <InputNumber v-model="pratica.importoPolizza"></InputNumber>
+            </div>
+
+            <div class="flex col flex-column mb-4">
+              <label>LTV</label>
+              <InputNumber v-model="pratica.LTV"></InputNumber>
+            </div>
+
+            <div class="flex col flex-column mb-4">
               <label>Rata</label>
-              <InputText type="text" placeholder="Tipo operazione" v-model="tmpItem.rata"></InputText>
+              <InputText type="text" v-model="pratica.importoRata"></InputText>
             </div>
 
-            <div class="flex col  flex-column  mb-4">
+            <div class="flex col flex-column mb-4">
               <label>Durata</label>
-              <InputText type="text" placeholder="Tipo operazione" v-model="tmpItem.durata"></InputText>
+              <InputText type="text" v-model="pratica.durata"></InputText>
             </div>
+          </div>
 
-            <div class="flex col  flex-column  mb-4">
-              <label>TAN</label>
-              <InputText type="text" placeholder="Tipo operazione" v-model="tmpItem.tan"></InputText>
+          <Divider class="my-4"></Divider>
+          <div class="col-12">
+            <h4>Polizze banca</h4>
+          </div>
+          <div class="col-12 flex justify-content-between">
+            <div class="flex">
+              <Checkbox
+                v-model="pratica.noPolizza"
+                :binary="true"
+                class="mr-2"
+              ></Checkbox>
+              <label>No polizza</label>
+            </div>
+            <div class="flex">
+              <Checkbox
+                v-model="pratica.polVitaUnico"
+                :binary="true"
+                class="mr-2"
+              ></Checkbox>
+              <label>Vita premio unico</label>
+            </div>
+            <div class="flex">
+              <Checkbox
+                v-model="pratica.polLavoroUnico"
+                :binary="true"
+                class="mr-2"
+              ></Checkbox>
+              <label>Lavoro premio unico</label>
+            </div>
+            <div class="flex">
+              <Checkbox
+                v-model="pratica.polVitaMensile"
+                :binary="true"
+                class="mr-2"
+              ></Checkbox>
+              <label>Vita prmensile</label>
+            </div>
+            <div class="flex">
+              <Checkbox
+                v-model="pratica.polLavoroMensile"
+                :binary="true"
+                class="mr-2"
+              ></Checkbox>
+              <label>Lavoro prmensile</label>
             </div>
           </div>
 
           <div class="col-12 flex flex-wrap justify-content-between">
-            <div class="flex col flex-column mr-4">
-              <label>Erogato</label>
-              <InputNumber type="number" v-model="tmpItem.erogato"></InputNumber>
+            <div class="flex col-12 col-md-3 flex-column">
+              <label>Premio totale polizza</label>
+              <InputNumber
+                type="number"
+                v-model="pratica.premioPolizza"
+              ></InputNumber>
             </div>
-            <div class="flex col flex-column">
-              <label>Importo Richiesto</label>
-              <InputNumber type="number" v-model="tmpItem.importo_richiesto"></InputNumber>
+            <div class="flex col-12 col-md-3 flex-column">
+              <label>Stato Pol. banca</label>
+              <InputNumber
+                type="number"
+                v-model="pratica.statoPolizza"
+              ></InputNumber>
+            </div>
+            <div class="flex col-12 col-md-3 flex-column">
+              <label>Data POL CT-L</label>
+              <Calendar v-model="pratica.dataPolizzaCtl"></Calendar>
+            </div>
+            <div class="flex col-12 col-md-3 flex-column">
+              <label>POL Data-Comp</label>
+              <Calendar v-model="pratica.polizzaDataComp"></Calendar>
             </div>
           </div>
 
-          <div v-if="!loading" class="col flex flex-column  mb-4">
-            <label>Utente</label>
-            <Dropdown :filter="true" :options="utentiOptions" optionLabel="text" optionValue="value"
-              v-model="tmpItem.utente">
-            </Dropdown>
+          <Divider class="my-4"></Divider>
+          <div class="col-12">
+            <h4>Immobile in oggetto</h4>
+          </div>
+
+          <div class="col-12 flex flex-wrap justify-content-between">
+            <div class="flex flex-column col-12 col-md-4">
+              <label>Tipo immobile</label>
+              <InputText v-model="pratica.tipoImmobile" type="text"></InputText>
+            </div>
+
+            <div class="flex flex-column col-12 col-md-4">
+              <label>Valore immobile</label>
+              <InputNumber v-model="pratica.valoreImmobile"></InputNumber>
+            </div>
+
+            <div class="flex flex-column col-12 col-md-4">
+              <label>Destinazione d'uso</label>
+              <InputText
+                v-model="pratica.destinazioneUso"
+                type="text"
+              ></InputText>
+            </div>
+
+            <div class="flex flex-column col-12 col-md-4">
+              <label>Provenienza immobile</label>
+              <InputText
+                v-model="pratica.provenienzaImmobile"
+                type="text"
+              ></InputText>
+            </div>
+
+            <div class="flex flex-column col-12 col-md-4">
+              <label>Comune</label>
+              <InputText
+                v-model="pratica.comuneImmobile"
+                type="text"
+              ></InputText>
+            </div>
+
+            <div class="flex flex-column col-12 col-md-4">
+              <label>CAP</label>
+              <InputText v-model="pratica.capImmobile" type="text"></InputText>
+            </div>
+
+            <div class="flex flex-column col-12 col-md-4">
+              <label>Indirizzo</label>
+              <InputText
+                v-model="pratica.indirizzoImmobile"
+                type="text"
+              ></InputText>
+            </div>
+
+            <div class="flex flex-column col-12 col-md-4">
+              <label>Numero civico</label>
+              <InputText
+                v-model="pratica.civicoImmobile"
+                type="text"
+              ></InputText>
+            </div>
+
+            <div class="flex align-items-center col-12 col-md-4">
+              <Checkbox
+                :binary="true"
+                v-model="pratica.voucherMutuo"
+                class="mr-4"
+              ></Checkbox>
+              <label>Voucher Mutuo</label>
+            </div>
+          </div>
+          <Divider class="my-4"></Divider>
+          <div class="col-12">
+            <h4>S.A.L.</h4>
+          </div>
+          <div class="col-12 flex flex-wrap justify-content-between">
+            <div class="flex align-items-center col-12 col-md-4">
+              <Checkbox
+                :binary="true"
+                v-model="pratica.sal"
+                class="mr-4"
+              ></Checkbox>
+              <label>Il mutuo è un SAL?</label>
+            </div>
+            <Message class="col-12" v-if="mutuoSal" severity="warn"
+              >La gestione dei SAL è esclusivamente in WebApp</Message
+            >
           </div>
 
           <div class="flex justify-content-end mb-4 w-full">
-            <Button label="Salva"></Button>
+            <Button
+              @click="salvaPratica"
+              :loading="loading"
+              label="Salva"
+            ></Button>
           </div>
         </div>
       </template>
@@ -67,34 +298,46 @@
 </template>
 
 <script setup>
-import AxiosService from '@/axiosServices/AxiosService';
-import { ref } from 'vue'
-
+import AxiosService from "@/axiosServices/AxiosService"
+import { ref } from "vue"
+import { useToast } from "primevue/usetoast"
+const toast = useToast()
+const pratica = ref({})
 const loading = ref(false)
-
-const tmpItem = ref({
-  tipoOperazione: 'Mutuo',
-  prodotto: 'Younited - Mutuo Fascia A',
-  istituto: 'YOUNITED SA',
-  rata: '422.10',
-  durata: '36',
-  tan: '3.9',
-  decorrenza: new Date('01/12/2022'),
-  scadenza: new Date('01/12/2026'),
-  rinnovo: new Date('01/12/2023'),
-  erogato: 10000,
-  importo_richiesto: 10000
-})
-
-const utentiOptions = ref()
-function getUtenti() {
+function salvaPratica() {
   loading.value = true
-  const service = new AxiosService('Options/GetUsers')
-  service.read()
-    .then(res => utentiOptions.value = res)
+  console.log("triggere salva dettagli pratica , ", pratica.value)
+  const service = new AxiosService("Pratiche/NuovaPratica/mutuo")
+
+  service
+    .create(pratica.value)
+    .then(() => {
+      toast.add({
+        severity: "success",
+        summary: "Pratica creata con successo",
+        detail: "La puoi trovare sul menu 'GESTIONE PRATICHE/Bozze'",
+        life: 10000,
+      })
+    })
     .finally(() => {
       loading.value = false
     })
 }
-getUtenti()
+
+const utentiOptions = ref()
+const loadingUtentiOptions = ref(false)
+function getUtentiOptions() {
+  loadingUtentiOptions.value = true
+  const service = new AxiosService("Options/GetUsers")
+  service
+    .read()
+    .then((res) => {
+      utentiOptions.value = res
+    })
+    .finally(() => {
+      loadingUtentiOptions.value = false
+    })
+}
+
+getUtentiOptions()
 </script>

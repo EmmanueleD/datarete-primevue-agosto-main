@@ -34,3 +34,24 @@
     outline: 0;
   }
 }
+
+.prestitosi-buttons .button-prestitosi {
+  background: #0e3996;
+  border: 1px solid #0e3996;
+
+  padding: 1rem 6rem;
+}
+
+.prestitosi-buttons .button-prestitosi:hover {
+  background: #fbff3d;
+  color: #0e3996;
+  // font-weight: bold;
+  border: 1px solid #0e3996;
+  padding: 1rem 6rem;
+}
+
+.prestitosi-buttons .button-prestitosi:focus {
+  box-shadow: 0 0 0 1px #1556e2;
+  border: 1px solid #0e3996;
+  padding: 1rem 6rem;
+}

@@ -2,6 +2,8 @@ import { createWebHistory, createRouter } from "vue-router"
 import store from "../store"
 import AppLayout from "@/views/layout/AppLayout.vue"
 
+const CURRENT_URL = window.location.href
+
 const router = createRouter({
   history: createWebHistory(),
   routes: [
@@ -42,6 +44,10 @@ const router = createRouter({
       component: AppLayout,
       children: [
         {
+          path: "/nuova-anagrafica/:idPratica",
+          component: () => import("@/views/NuovaAnagrafica.vue"),
+        },
+        {
           path: "/uploader",
           component: () => import("@/views/Upload.vue"),
         },
@@ -57,10 +63,10 @@ const router = createRouter({
         {
           path: "/testtry2",
           name: "test2",
-          component: () => import("@/views/TestTry2.vue"),
+          component: () => import("@/views/DocumentiBelli.vue"),
         },
         {
-          path: "testtry3",
+          path: "/testtry3",
           name: "test3",
           component: () => import("@/views/Testtry3.vue"),
         },
@@ -73,11 +79,27 @@ const router = createRouter({
           },
         },
         {
+          path: "dashboard-due",
+          name: "Dashboard-due",
+          component: () => import("@/views/Dashboard_2.vue"),
+          meta: {
+            title: "DatRete - Dashboard 2",
+          },
+        },
+        {
           path: "statistiche",
           name: "Statistiche",
           component: () => import("@/views/Statistiche.vue"),
           meta: {
             title: "DataRete - Statistiche",
+          },
+        },
+        {
+          path: "statistiche-produzione",
+          name: "StatisticheProduzione",
+          component: () => import("@/views/StatisticheProduzione.vue"),
+          meta: {
+            title: "DataRete - Statistiche produzione",
           },
         },
         {
@@ -215,6 +237,11 @@ const router = createRouter({
               component: () => import("@/views/pratiche/NuovaCQS.vue"),
             },
             {
+              path: "nuova-delega",
+              name: "nuova-delega",
+              component: () => import("@/views/pratiche/NuovaDelega.vue"),
+            },
+            {
               path: "preventivi",
               name: "preventivi",
               component: () => import("@/views/pratiche/Preventivi.vue"),
@@ -245,6 +272,18 @@ const router = createRouter({
           path: "gestione",
           name: "gestione",
           children: [
+            {
+              path: "notizie",
+              component: () => import("@/views/gestione/Notizie.vue"),
+            },
+            {
+              path: "stati-compensi",
+              component: () => import("@/views/gestione/StatiCompensi.vue"),
+            },
+            {
+              path: "log-importazione",
+              component: () => import("@/views/gestione/LogImportazione.vue"),
+            },
             {
               path: "elenco-preventivi-salvati",
               component: () =>
@@ -283,6 +322,10 @@ const router = createRouter({
               path: "dettaglio-corso/:idCorso",
               component: () =>
                 import("@/views/gestione/DettaglioCorsoDiFormazione.vue"),
+            },
+            {
+              path: "formazione-online",
+              component: () => import("@/views/gestione/FormazioneOnline.vue"),
             },
             {
               path: "argomenti-ticket",
@@ -388,6 +431,15 @@ const router = createRouter({
               path: "livelli-login",
               component: () => import("@/views/gestione/LivelliLogin.vue"),
             },
+            {
+              path: "categorie-learning",
+              component: () => import("@/views/gestione/CategorieLearning.vue"),
+            },
+            {
+              path: "tipo-doc-pratiche",
+              component: () =>
+                import("@/views/gestione/TipiDocumentoPratiche.vue"),
+            },
           ],
         },
         {
@@ -482,6 +534,7 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
   console.log("Authenticated:" + store.getters.isAuthenticated)
+
   if (
     to.name !== "Login" &&
     to.name !== "ChangePasswordRequest" &&

@@ -72,7 +72,7 @@ function getDocumentiPratica() {
 
   service.read().then((res) => {
     documentiPratica.value = res;
-    console.log(documentiPratica.value);
+    console.log("documenti pratica , , ,   ", documentiPratica.value);
   });
 }
 

@@ -80,6 +80,16 @@
                 </MultiSelect>
               </div>
               <div class="flex flex-column col-md-3 col-12 flex-grow mb-4">
+                <label>Origine lead</label>
+                <Dropdown
+                  :filter="true"
+                  v-model="filtro.origine_lead"
+                  :options="origineLeadOptions"
+                  optionLabel="text"
+                  optionValue="text"
+                ></Dropdown>
+              </div>
+              <div class="flex flex-column col-md-3 col-12 flex-grow mb-4">
                 <label>Commerciale</label>
                 <MultiSelect
                   :filter="true"
@@ -158,14 +168,31 @@
       <i class="pi pi-spin pi-spinner font-size-2"> </i>
     </div>
     <div v-else>
-      <div class="w-full flex justify-content-end align-items-center mb-4">
-        <span class="mr-2">Anagrafiche da visualizzare</span>
-        <InputNumber
-          class="mr-2"
-          type="number"
-          v-model="rowsToShow"
-        ></InputNumber>
-        <Button @click="getTableItems" label="Applica"></Button>
+      <div class="w-full flex justify content-end">
+        <div class="w-full flex justify-content-end align-items-center mb-4">
+          <div class="w-full flex justify-content-start">
+            <InputText
+              class="mr-2"
+              placeholder="Ricerca generale..."
+              v-model="filtro.fullSearch"
+            ></InputText>
+            <Button
+              :loading="loading"
+              @click="getTableItemsFromFilter"
+              :label="loading ? 'Compilando i risultati' : 'Cerca'"
+            ></Button>
+          </div>
+        </div>
+        <div class="w-full flex justify-content-end align-items-center mb-4">
+          <span class="mr-2">Anagrafiche da visualizzare</span>
+          <InputNumber
+            class="mr-2"
+            type="number"
+            v-model="rowsToShow"
+            placeholder="Anagrafiche da visualizzare"
+          ></InputNumber>
+          <Button @click="getTableItems" label="Applica"></Button>
+        </div>
       </div>
       <TableBuilder
         ref="TableComponent"
@@ -525,6 +552,7 @@ const filtro = ref({
   data_prossimo_rinnovo: "",
   data_prossimo_contatto: "",
   sottostato: [],
+  origine_lead: "",
 });
 
 const filtroToCall = ref({
@@ -544,6 +572,7 @@ const filtroToCall = ref({
   data_prossimo_rinnovo: "",
   data_prossimo_contatto: "",
   sottostato: [],
+  origine_lead: "",
 });
 
 function resetFilter() {
@@ -564,6 +593,7 @@ function resetFilter() {
     data_prossimo_rinnovo: "",
     data_prossimo_contatto: "",
     sottostato: [],
+    origine_lead: "",
   };
 }
 
@@ -787,7 +817,7 @@ function onPage(event) {
 
 function onSort(event) {
   filtro.value.order_campo = event.sortField;
-  event.sortOrder == 1
+  event.sortOrder == -1
     ? (filtro.value.order_type = "ASC")
     : (filtro.value.order_type = "DESC");
   getTableItems();
@@ -838,6 +868,16 @@ function getSubStatoOptions() {
 
 const rowsToShow = ref(10);
 
+const origineLeadOptions = ref();
+function getOrigineLeadOptions() {
+  const service = new AxiosService("Options/GetOrigineLead");
+
+  service.read().then((res) => {
+    origineLeadOptions.value = res;
+  });
+}
+
+getOrigineLeadOptions();
 getStatoOptions();
 getOrigineOptions();
 getUsersOptions();

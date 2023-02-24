@@ -24,6 +24,15 @@
                 class="w-full flex justify-content-between flex-wrap gap-4 mb-4"
               >
                 <div class="flex flex-column flex-grow-1">
+                  <label class="mb-2">Data inizio / Data fine</label>
+                  <Calendar
+                    v-model="filterLead.data_creazione"
+                    selectionMode="range"
+                    :manualInput="false"
+                  ></Calendar>
+                </div>
+
+                <div class="flex flex-column flex-grow-1">
                   <label class="mb-2">Origine</label>
                   <MultiSelect
                     v-model="filterLead.origine"
@@ -34,15 +43,6 @@
                     :filter="true"
                   ></MultiSelect>
                 </div>
-
-                <!-- <div class="flex flex-column flex-grow-1">
-                  <label class="mb-2">Data assegnazione</label>
-                  <Calendar
-                    v-model="filterLead.data"
-                    selectionMode="range"
-                    :manualInput="false"
-                  ></Calendar>
-                </div> -->
 
                 <div class="flex flex-column flex-grow-1">
                   <label class="mb-2">Filiale</label>

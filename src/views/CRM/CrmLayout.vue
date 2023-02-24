@@ -3,22 +3,7 @@
     <div class="contenitore-stati w-full flex justify-content-between my-4">
       <div
         @click="openSetStato(step)"
-        class="
-          item-stato
-          clip-path
-          flex
-          justify-content-center
-          align-items-center
-          text-xs
-          bg-blue-200
-          py-2
-          px-4
-          text-black-alpha-90
-          font-normal
-          border-round-md
-          text-center
-          cursor-pointer
-        "
+        class="item-stato clip-path flex justify-content-center align-items-center text-xs bg-blue-200 py-2 px-4 text-black-alpha-90 font-normal border-round-md text-center cursor-pointer"
         :class="{ 'step-attivo': step.id == currentCrm.idLastStatus }"
         v-for="step in stepsItems"
         :key="step.label"
@@ -118,14 +103,14 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
-import CrmFeed from "./CrmFeed.vue";
+import { ref } from "vue"
+import CrmFeed from "./CrmFeed.vue"
 // import CrmCreateNewItem from './CrmCreateNewItem.vue';
-import CrmUser from "./CrmUser.vue";
-import CRMQuestionariEScript from "./CRMQuestionariEScript.vue";
-import AxiosService from "@/axiosServices/AxiosService";
-import { useRoute } from "vue-router";
-import store from "@/store";
+import CrmUser from "./CrmUser.vue"
+import CRMQuestionariEScript from "./CRMQuestionariEScript.vue"
+import AxiosService from "@/axiosServices/AxiosService"
+import { useRoute } from "vue-router"
+import store from "@/store"
 
 // eslint-disable-next-line no-undef, no-unused-vars
 const props = defineProps({
@@ -133,90 +118,90 @@ const props = defineProps({
     type: Boolean,
     default: true,
   },
-});
-const route = useRoute();
-const loading = ref(false);
+})
+const route = useRoute()
+const loading = ref(false)
 
-const stepsItems = ref([]);
+const stepsItems = ref([])
 async function getStati(idPadre) {
-  stepsItems.value.splice(0);
-  loading.value = true;
-  let risultato;
+  stepsItems.value.splice(0)
+  loading.value = true
+  let risultato
   const service = new AxiosService(
     "Options/StatiAnagrafiche/GetStati/" + idPadre
-  );
+  )
   await service
     .read()
     .then((res) => (risultato = res))
-    .finally(() => (loading.value = false));
-  return risultato;
+    .finally(() => (loading.value = false))
+  return risultato
 }
 
-stepsItems.value = await getStati("0");
+stepsItems.value = await getStati("0")
 
 function event_changeType(ev) {
-  newItemType.value = ev;
+  newItemType.value = ev
 }
-const doReloadFeed = ref(false);
+const doReloadFeed = ref(false)
 function reloadFeed() {
-  doReloadFeed.value = true;
+  doReloadFeed.value = true
 }
 
 function feedReloaded() {
-  doReloadFeed.value = false;
+  doReloadFeed.value = false
 }
 
-const currentCrm = ref();
+const currentCrm = ref()
 
 function getAnagrafica() {
-  currentCrm.value = {};
+  currentCrm.value = {}
   const serviceGET = new AxiosService(
     "Anagrafiche/Retail/" + route.params.idAnagrafica
-  );
+  )
   serviceGET.read().then((res) => {
-    currentCrm.value = res;
-  });
+    currentCrm.value = res
+  })
 }
 
-const setStatoVisible = ref(false);
-const statusSelected = ref();
-const statusOptions = ref([]);
+const setStatoVisible = ref(false)
+const statusSelected = ref()
+const statusOptions = ref([])
 function getStatusOptions() {
-  loading.value = true;
-  const service = new AxiosService("Options/StatiAnagrafiche/GetStati");
+  loading.value = true
+  const service = new AxiosService("Options/StatiAnagrafiche/GetStati")
   service
     .read()
     .then((res) => (statusOptions.value = res))
     .finally(() => {
-      loading.value = false;
-    });
+      loading.value = false
+    })
 }
 
 function openSetStato(stato) {
-  setStatoVisible.value = true;
-  statusSelected.value = stato;
+  setStatoVisible.value = true
+  statusSelected.value = stato
 }
 
-const note = ref("");
+const note = ref("")
 function salvaStato() {
   const stato = {
     ID_STATO: statusSelected.value.id,
     NOTE: note.value,
-  };
+  }
 
   if (statusSelected.value.sottostato) {
-    stato.ID_SOTTOSTATO = statusSelected.value.sottostato.id;
+    stato.ID_SOTTOSTATO = statusSelected.value.sottostato.id
   }
 
   if (statusSelected.value.DATA_RECALL) {
-    stato.DATA_RECALL = statusSelected.value.DATA_RECALL;
+    stato.DATA_RECALL = statusSelected.value.DATA_RECALL
   }
   if (statusSelected.value.DATA_POSSIBILE_RINNOVO) {
-    stato.DATA_POSSIBILE_RINNOVO = statusSelected.value.DATA_POSSIBILE_RINNOVO;
+    stato.DATA_POSSIBILE_RINNOVO = statusSelected.value.DATA_POSSIBILE_RINNOVO
   }
 
-  loading.value = true;
-  const service = new AxiosService("");
+  loading.value = true
+  const service = new AxiosService("")
   service
     .updateWithoutId(
       "Anagrafiche/UpdateStatus/" + route.params.idAnagrafica,
@@ -224,41 +209,40 @@ function salvaStato() {
     )
     .then((res) => console.log(res))
     .finally(() => {
-      loading.value = false;
-      setStatoVisible.value = false;
-      reloadFeed();
-      getCurretnStatoAnagrafica();
-      getAnagrafica();
+      loading.value = false
+      setStatoVisible.value = false
+      reloadFeed()
+      getCurretnStatoAnagrafica()
+      getAnagrafica()
       if (statusSelected.value.DATA_DA_RICHIAMARE)
-        createEventDaRichiamare(statusSelected.value);
-      if (statusSelected.value.DATA_RECALL)
-        createEventDPR(statusSelected.value);
-    });
+        createEventDaRichiamare(statusSelected.value)
+      if (statusSelected.value.DATA_RECALL) createEventDPR(statusSelected.value)
+    })
 }
 
 async function createEventDaRichiamare(event) {
   console.log(
     "🚀 ~ file: CrmLayout.vue:167 ~ createEventDaRichiamare ~ event",
     event
-  );
+  )
 
-  let numero_di_teledono = null;
-  let currentGetCrm = null;
+  let numero_di_teledono = null
+  let currentGetCrm = null
   const serviceGET = new AxiosService(
     "Anagrafiche/Retail/" + route.params.idAnagrafica
-  );
+  )
   serviceGET
     .read()
     .then((res) => {
-      currentGetCrm = res;
+      currentGetCrm = res
     })
     .finally(() => {
       currentGetCrm.contatti.forEach((element) => {
         if (element.TipoContatto == "Cellulare") {
-          numero_di_teledono = element.valore;
+          numero_di_teledono = element.valore
         }
 
-        const service = new AxiosService("Calendar/AddEvent");
+        const service = new AxiosService("Calendar/AddEvent")
         service
           .create({
             id_type: 4,
@@ -277,34 +261,34 @@ async function createEventDaRichiamare(event) {
               },
             ],
           })
-          .then((res) => console.log("DA RICHIAMARE - CREATE EVENT : ", res));
-      });
-    });
+          .then((res) => console.log("DA RICHIAMARE - CREATE EVENT : ", res))
+      })
+    })
 }
 
 async function createEventDPR(event) {
   console.log(
     "🚀 ~ file: CrmLayout.vue:167 ~ createEventDaRichiamare ~ event",
     event
-  );
+  )
 
-  let numero_di_teledono = null;
-  let currentGetCrm = null;
+  let numero_di_teledono = null
+  let currentGetCrm = null
   const serviceGET = new AxiosService(
     "Anagrafiche/Retail/" + route.params.idAnagrafica
-  );
+  )
   serviceGET
     .read()
     .then((res) => {
-      currentGetCrm = res;
+      currentGetCrm = res
     })
     .finally(() => {
       currentGetCrm.contatti.forEach((element) => {
         if (element.TipoContatto == "Cellulare") {
-          numero_di_teledono = element.valore;
+          numero_di_teledono = element.valore
         }
 
-        const service = new AxiosService("Calendar/AddEvent");
+        const service = new AxiosService("Calendar/AddEvent")
         service
           .create({
             id_type: 4,
@@ -320,25 +304,24 @@ async function createEventDPR(event) {
               },
             ],
           })
-          .then((res) => console.log("DPR - CREATE EVENT : ", res));
-      });
-    });
+          .then((res) => console.log("DPR - CREATE EVENT : ", res))
+      })
+    })
 }
 
-const currentStatoAnagrafica = ref();
+const currentStatoAnagrafica = ref()
 function getCurretnStatoAnagrafica() {
-  currentStatoAnagrafica.value = {};
+  currentStatoAnagrafica.value = {}
   const service = new AxiosService(
     "Anagrafiche/GetLastStatusInfo/" + route.params.idAnagrafica
-  );
-  service.read().then((res) => (currentStatoAnagrafica.value = res));
+  )
+  service.read().then((res) => (currentStatoAnagrafica.value = res))
 }
-getCurretnStatoAnagrafica();
+getCurretnStatoAnagrafica()
 
-getStatusOptions();
-getAnagrafica();
+getStatusOptions()
+getAnagrafica()
 </script>
-
 
 <style>
 .clip-path {

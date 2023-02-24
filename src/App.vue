@@ -15,35 +15,36 @@
 </template>
 
 <script>
-import { computed } from "vue";
-import { useStore } from "vuex";
-import { CONFIG_REQUEST } from "./store/actions/config";
-import { AUTH_LOGOUT } from "./store/actions/auth";
-import { USER_REQUEST } from "./store/actions/user";
-import axios from "axios";
-import ProgressSpinner from "primevue/progressspinner";
-import Login from "./views/login/Login.vue";
-import ConfirmDialog from "primevue/confirmdialog";
+import { computed } from "vue"
+import { useStore } from "vuex"
+import { CONFIG_REQUEST } from "./store/actions/config"
+import { AUTH_LOGOUT } from "./store/actions/auth"
+import { USER_REQUEST } from "./store/actions/user"
+import axios from "axios"
+import ProgressSpinner from "primevue/progressspinner"
+import Login from "./views/login/Login.vue"
+import ConfirmDialog from "primevue/confirmdialog"
 
 export default {
   name: "App",
   components: { ProgressSpinner, Login, ConfirmDialog },
   setup() {
-    const store = useStore();
+    const store = useStore()
 
     // const configuration_loaded = computed(() => {
     //   return store.getters["configuration_loaded"];
     // });
+
     const isAuthenticated = computed(() => {
-      return store.getters["isAuthenticated"];
-    });
+      return store.getters["isAuthenticated"]
+    })
     // const user_loaded = computed(() => {
     //   return store.getters["user_loaded"];
     // });
 
     //Se autenticato ricarico dati utente
     if (isAuthenticated.value) {
-      store.dispatch(USER_REQUEST);
+      store.dispatch(USER_REQUEST)
     }
 
     // //Richiesta di configurazioni
@@ -53,16 +54,16 @@ export default {
       return new Promise(function () {
         if (err.status === 401 && err.config && !err.config.__isRetryRequest) {
           store.dispatch(AUTH_LOGOUT).then(() => {
-            this.$router.push("/");
-          });
+            this.$router.push("/")
+          })
         }
-        throw err;
-      });
-    });
+        throw err
+      })
+    })
 
-    return {};
+    return {}
   },
-};
+}
 </script>
 
 <style>

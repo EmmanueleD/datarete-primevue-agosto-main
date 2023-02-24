@@ -521,12 +521,7 @@
                 />
               </div>
               <div
-                class="
-                  flex
-                  justify-content-center
-                  align-items-end
-                  col-12 col-md-2
-                "
+                class="flex justify-content-center align-items-end col-12 col-md-2"
               >
                 <Checkbox
                   class="contatti"
@@ -629,6 +624,19 @@
                   :minDate="new Date(item.dataRilascio) || new Date()"
                 ></Calendar>
               </div>
+              <div class="flex flex-column col-12">
+                <FileUpload
+                  @uploader="uploadFile"
+                  mode="basic"
+                  uploadIcon="pi pi-upload"
+                  name="demo[]"
+                  :customUpload="true"
+                  :previewWidth="50"
+                  :maxFileSize="1000000"
+                  chooseLabel="Carica Documento"
+                  :auto="false"
+                />
+              </div>
             </div>
             <div
               class="flex align-items-end justify-content-end pb-4"
@@ -686,9 +694,12 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
-import AxiosService from "../../axiosServices/AxiosService";
-import { useToast } from "primevue/usetoast";
+import { ref } from "vue"
+import AxiosService from "../../axiosServices/AxiosService"
+import { useToast } from "primevue/usetoast"
+import { useRoute } from "vue-router"
+
+import { isEqual, uniq, join } from "lodash"
 // import ChooserGeography from '@/components/ChooserGeography.vue'
 // eslint-disable-next-line no-undef
 const props = defineProps({
@@ -710,51 +721,90 @@ const props = defineProps({
     type: Boolean,
     default: true,
   },
-});
+})
 
 // eslint-disable-next-line no-undef
-const emit = defineEmits(["event_refreshList", "event_HideNuovaAnagrafica"]);
-const toast = useToast();
+const emit = defineEmits(["event_refreshList", "event_HideNuovaAnagrafica"])
+const toast = useToast()
+const route = useRoute()
 
-const mode = ref("view");
+const mode = ref("view")
+
+const urlFile = ref()
+function uploadFile(ev) {
+  loading.value = true
+  urlFile.value = ""
+  const service = new AxiosService("files")
+  for (let i = 0; i < ev.files.length; i++) {
+    const formData = new FormData()
+    formData.append("file", ev.files[i])
+    service
+      .postCustomEndpoint("Upload?type=" + "AnagraficaClienti", "", formData)
+      .then((res) => {
+        console.log(
+          "🚀 ~ file: NuovaCircolare.vue ~ line 78 ~ uploadFile ~ res",
+          res
+        )
+        urlFile.value = res
+      })
+      .finally(() => {
+        const service = new AxiosService(
+          "Drive/AddFile/" + props.idDrive + "/" + currentFolderId.value
+        )
+        service
+          .create({
+            nome: urlFile.value.substring(
+              urlFile.value.indexOf("_") + 1,
+              urlFile.value.length
+            ),
+            file_url: urlFile.value,
+          })
+          .then((res) => console.log(res))
+          .finally(() => {
+            breadcrumbNavigation(currentFolder.value, steps.value.length - 1)
+            loading.value = false
+          })
+      })
+  }
+}
 
 //GET SIDEBARDATA
 function setupSidebar() {
   if (props.sidebarData) {
     const serviceGET = new AxiosService(
       "Anagrafiche/Retail/" + props.sidebarData.ID
-    );
+    )
     serviceGET
       .read()
       .then((res) => {
-        anagraficaClienti.value = res;
+        anagraficaClienti.value = res
         anagraficaClienti.value.DATA_DECORRENZA
           ? (anagraficaClienti.value.DATA_DECORRENZA = new Date(
               res.DATA_DECORRENZA
             ))
-          : (anagraficaClienti.value.DATA_DECORRENZA = "");
+          : (anagraficaClienti.value.DATA_DECORRENZA = "")
         anagraficaClienti.value.DATA_POSSIBILE_RINNOVO
           ? (anagraficaClienti.value.DATA_POSSIBILE_RINNOVO = new Date(
               res.DATA_POSSIBILE_RINNOVO
             ))
-          : (anagraficaClienti.value.DATA_POSSIBILE_RINNOVO = "");
+          : (anagraficaClienti.value.DATA_POSSIBILE_RINNOVO = "")
         anagraficaClienti.value.DATA_PROSSIMO_CONTATTO
           ? (anagraficaClienti.value.DATA_PROSSIMO_CONTATTO = new Date(
               res.DATA_PROSSIMO_CONTATTO
             ))
-          : (anagraficaClienti.value.DATA_PROSSIMO_CONTATTO = "");
+          : (anagraficaClienti.value.DATA_PROSSIMO_CONTATTO = "")
 
         anagraficaClienti.value.dataNascita
           ? (anagraficaClienti.value.dataNascita = new Date(res.dataNascita))
-          : (anagraficaClienti.value.dataNascita = "");
+          : (anagraficaClienti.value.dataNascita = "")
 
         anagraficaClienti.value.dataAssunzione
           ? (anagraficaClienti.value.dataAssunzione = new Date(
               res.dataAssunzione
             ))
-          : (anagraficaClienti.value.dataAssunzione = "");
+          : (anagraficaClienti.value.dataAssunzione = "")
       })
-      .catch((err) => console.log(err));
+      .catch((err) => console.log(err))
 
     // Object.assign(anagraficaClienti.value, props.sidebarData);
   }
@@ -794,8 +844,8 @@ function setupSidebar() {
 
 function checkOnlyOnePrincipale(index) {
   anagraficaClienti.value.contatti.forEach((element, i) => {
-    if (i != index) element.principale = false;
-  });
+    if (i != index) element.principale = false
+  })
 }
 
 function addRowDocumenti() {
@@ -808,7 +858,7 @@ function addRowDocumenti() {
     dataScadenza: "",
     idProvinciaRilascio: 0,
     idCittaRilascio: 0,
-  });
+  })
 }
 
 function addRowContatti() {
@@ -818,11 +868,11 @@ function addRowContatti() {
     nome: null,
     valore: null,
     principale: false,
-  };
-  if (!anagraficaClienti.value.contatti.length) {
-    object.principale = true;
   }
-  anagraficaClienti.value.contatti.push(object);
+  if (!anagraficaClienti.value.contatti.length) {
+    object.principale = true
+  }
+  anagraficaClienti.value.contatti.push(object)
 }
 
 function addRowIndirizzi() {
@@ -835,112 +885,198 @@ function addRowIndirizzi() {
     idRegione: 0,
     idProvincia: 0,
     idCitta: 0,
-  });
+  })
 }
-const loading = ref(false);
+const loading = ref(false)
 function saveForm() {
-  loading.value = true;
-  const servicePOST = new AxiosService("Anagrafiche/AddRetail");
-  const servicePUT = new AxiosService("Anagrafiche/SaveRetail");
-  if (anagraficaClienti.value.ID || anagraficaClienti.value.id) {
-    servicePUT
-      .update(anagraficaClienti.value)
-      .then(() => {
-        toast.add({
-          severity: "success",
-          summary: "Anagrafica Clienti modificata",
-          detail: anagraficaClienti.value.NOME,
-          life: 3000,
-        });
-      })
-      .catch((error) => {
-        toast.add({
-          severity: "error",
-          summary: "Errore nella modifica dell'anagrafica",
-          detail: error,
-          life: 3000,
-        });
-      })
-      .finally(() => {
-        emit("event_refreshList");
-        emit("event_HideNuovaAnagrafica");
-        mode.value = "view";
-        loading.value = false;
-      });
-  } else {
-    servicePOST
-      .create(anagraficaClienti.value)
-      .then((res) => {
-        if (res) {
-          toast.add({
-            severity: "success",
-            summary: "Nuova Anagrafica Clienti creata",
-            detail: anagraficaClienti.value.NOME,
-            life: 3000,
-          });
-          emit("event_refreshList");
-          emit("event_HideNuovaAnagrafica");
+  loading.value = true
+  const serviceGET = new AxiosService(
+    "Anagrafiche/Retail/" + route.params.idAnagrafica
+  )
+
+  const servicePOST = new AxiosService("Anagrafiche/AddRetail")
+  const servicePUT = new AxiosService("Anagrafiche/SaveRetail")
+
+  const servicePostNewNota = new AxiosService(
+    "Crm/InsertCrmRecord/" + route.params.idAnagrafica
+  )
+
+  let oldAnagrafica = {}
+  let currentChanges = ""
+
+  serviceGET
+    .read()
+    .then((res) => {
+      oldAnagrafica = { ...res }
+      console.log("old anagrafica", oldAnagrafica)
+    })
+    .finally(() => {
+      let arrayDeiCambi = getUpdatedKey(oldAnagrafica, anagraficaClienti.value)
+      let stringaDiCambi = []
+
+      arrayDeiCambi.forEach((cambio) => {
+        if (
+          oldAnagrafica[cambio] == null &&
+          anagraficaClienti.value[cambio] == ""
+        ) {
+          return
+        } else if (
+          typeof oldAnagrafica[cambio] == "string" &&
+          typeof anagraficaClienti.value[cambio] == "object"
+        ) {
+          return
+        } else if (anagraficaClienti.value[cambio] == "") {
+          stringaDiCambi.push(
+            cambio + " da: " + oldAnagrafica[cambio] + ' a: " "'
+          )
+        } else if (oldAnagrafica[cambio] == "") {
+          stringaDiCambi.push(
+            cambio + " da: " + '" "' + " a: " + anagraficaClienti.value[cambio]
+          )
+        } else {
+          stringaDiCambi.push(
+            cambio +
+              " da: " +
+              oldAnagrafica[cambio] +
+              " a: " +
+              anagraficaClienti.value[cambio]
+          )
         }
       })
-      .catch((error) => {
-        toast.add({
-          severity: "error",
-          summary: "Errore nella creazione dell'anagrafica",
-          detail: error,
-          life: 3000,
-        });
-        emit("event_refreshList");
-        emit("event_HideNuovaAnagrafica");
-      })
-      .finally(() => {
-        loading.value = false;
-      });
+
+      currentChanges = join(stringaDiCambi, ", ")
+
+      servicePostNewNota
+        .create({ oggetto: "Anagrafica Modificata", messaggio: currentChanges })
+        .then((res) => console.log(res))
+        .finally(() => {
+          if (anagraficaClienti.value.ID || anagraficaClienti.value.id) {
+            servicePUT
+              .update(anagraficaClienti.value)
+              .then(() => {
+                toast.add({
+                  severity: "success",
+                  summary: "Anagrafica Clienti modificata",
+                  detail: anagraficaClienti.value.NOME,
+                  life: 3000,
+                })
+              })
+              .catch((error) => {
+                toast.add({
+                  severity: "error",
+                  summary: "Errore nella modifica dell'anagrafica",
+                  detail: error,
+                  life: 3000,
+                })
+              })
+              .finally(() => {
+                emit("event_refreshList")
+                emit("event_HideNuovaAnagrafica")
+                mode.value = "view"
+                loading.value = false
+              })
+          } else {
+            servicePOST
+              .create(anagraficaClienti.value)
+              .then((res) => {
+                if (res) {
+                  console.log(
+                    "🚀 ~ file: NuovaAnagrafica.vue:988 ~ .then ~ res:",
+                    res
+                  )
+                  toast.add({
+                    severity: "success",
+                    summary: "Nuova Anagrafica Clienti creata",
+                    detail: anagraficaClienti.value.NOME,
+                    life: 3000,
+                  })
+                  emit("event_refreshList", res)
+                  emit("event_HideNuovaAnagrafica", {
+                    id: res,
+                    anagrafica: anagraficaClienti.value,
+                  })
+                }
+              })
+              .catch((error) => {
+                toast.add({
+                  severity: "error",
+                  summary: "Errore nella creazione dell'anagrafica",
+                  detail: error,
+                  life: 3000,
+                })
+                emit("event_refreshList")
+                emit("event_HideNuovaAnagrafica")
+              })
+              .finally(() => {
+                loading.value = false
+              })
+          }
+        })
+    })
+}
+
+function getUpdatedKey(oldData, newData) {
+  const data = uniq([...Object.keys(oldData), ...Object.keys(newData)])
+  const keys = []
+  for (const key of data) {
+    if (!isEqual(oldData[key], newData[key])) {
+      keys.push(key)
+    }
   }
+
+  return keys
+}
+
+function toHash(array, keyName, valueName) {
+  return array.reduce(function (dictionary, next) {
+    dictionary[next[keyName]] = next[valueName]
+    return dictionary
+  }, {})
 }
 
 function resetExpirationDate() {
-  anagraficaClienti.value.dataScadenzaContratto = "";
+  anagraficaClienti.value.dataScadenzaContratto = ""
 }
 
 function getSex() {
-  const service = new AxiosService("GetSesso");
+  const service = new AxiosService("GetSesso")
   service.getOptions("GetSesso").then((res) => {
     if (res) {
-      options.value.sex.push(...res);
+      options.value.sex.push(...res)
     }
-  });
+  })
 }
-getSex();
+getSex()
 
 function getMaritalStatus() {
-  const service = new AxiosService("GetStatoCivile");
+  const service = new AxiosService("GetStatoCivile")
   service.getOptions("GetStatoCivile").then((res) => {
     if (res) {
-      options.value.maritalStatus.push(...res);
+      options.value.maritalStatus.push(...res)
     }
-  });
+  })
 }
-getMaritalStatus();
+getMaritalStatus()
 
 function jobActivityType() {
-  const service = new AxiosService("GetTipoOccupazione");
+  const service = new AxiosService("GetTipoOccupazione")
   service.getOptions("GetTipoOccupazione").then((res) => {
     if (res) {
-      options.value.jobActivityType.push(...res);
+      options.value.jobActivityType.push(...res)
     }
-  });
+  })
 }
-jobActivityType();
+jobActivityType()
 
 function getNations() {
-  const service = new AxiosService("Geographic/GetNazioni");
+  const service = new AxiosService("Geographic/GetNazioni")
   service.getOptions("Geographic/GetNazioni").then((res) => {
     if (res) {
-      options.value.birthNation.push(...res);
+      options.value.birthNation.push(...res)
     }
-  });
+  })
 }
-getNations();
+getNations()
 
 // function getRegions(idNation) {
 
@@ -1011,7 +1147,7 @@ const anagraficaClienti = ref({
   documentiDelete: [],
   luogoNascita: "",
   pIva: "",
-});
+})
 
 const options = ref({
   sex: [],
@@ -1021,7 +1157,7 @@ const options = ref({
   birthCity: [],
   maritalStatus: [],
   jobActivityType: [],
-});
+})
 
 // function populateTempItemFromGeoFilter(event, item) {
 //   console.log("🚀 ~ file: NuovaAnagrafica.vue:577 ~ populateTempItemFromGeoFilter ~ item", item)
@@ -1035,71 +1171,71 @@ const options = ref({
 
 // }
 
-const tipiIndirizzoOptions = ref();
+const tipiIndirizzoOptions = ref()
 function getTipiIndirizzo() {
-  const serviceGET = new AxiosService("Options/GetTipoIndirizzo");
+  const serviceGET = new AxiosService("Options/GetTipoIndirizzo")
   serviceGET
     .read()
     .then((res) => (tipiIndirizzoOptions.value = res))
-    .catch((err) => console.log(err));
+    .catch((err) => console.log(err))
 }
 
-getTipiIndirizzo();
+getTipiIndirizzo()
 
-const tipidocumentoOptions = ref();
+const tipidocumentoOptions = ref()
 function getTipiDocumento() {
-  const serviceGET = new AxiosService("Options/GetTipoDocumento");
+  const serviceGET = new AxiosService("Options/GetTipoDocumento")
   serviceGET
     .read()
     .then((res) => (tipidocumentoOptions.value = res))
-    .catch((err) => console.log(err));
+    .catch((err) => console.log(err))
 }
 
-getTipiDocumento();
+getTipiDocumento()
 
-const tipiContattoOptions = ref();
+const tipiContattoOptions = ref()
 function getTipiContatto() {
-  const serviceGET = new AxiosService("Options/GetTipoContatto");
+  const serviceGET = new AxiosService("Options/GetTipoContatto")
   serviceGET
     .read()
     .then((res) => (tipiContattoOptions.value = res))
-    .catch((err) => console.log(err));
+    .catch((err) => console.log(err))
 }
 
-const origineOptions = ref();
+const origineOptions = ref()
 function getOrigineOptions() {
-  loading.value = true;
-  const service = new AxiosService("Marketing/Campaigns");
+  loading.value = true
+  const service = new AxiosService("Marketing/Campaigns")
   service
     .read()
     .then((res) => (origineOptions.value = res))
     .finally(() => {
-      loading.value = false;
-    });
+      loading.value = false
+    })
 }
 
-const proprietarioOptions = ref();
-const commercialeOptions = ref();
+const proprietarioOptions = ref()
+const commercialeOptions = ref()
 
 function getUsers() {
-  loading.value = true;
-  const service = new AxiosService("Options/GetUsers");
+  loading.value = true
+  const service = new AxiosService("Options/GetUsers")
   service
     .read()
     .then((res) => {
-      proprietarioOptions.value = res;
-      commercialeOptions.value = res;
+      proprietarioOptions.value = res
+      commercialeOptions.value = res
     })
     .finally(() => {
-      loading.value = false;
-    });
+      loading.value = false
+    })
 }
 
-getUsers();
+getUsers()
 
-getOrigineOptions();
+getOrigineOptions()
 
-setupSidebar();
+setupSidebar()
 
-getTipiContatto();
+getTipiContatto()
 </script>

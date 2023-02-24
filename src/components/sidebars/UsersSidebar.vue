@@ -48,6 +48,26 @@
       <label for="attivo">Attivo</label>
       <Checkbox id="attivo" :binary="true" v-model="tmpUser.attivo"></Checkbox>
     </div>
+    <div class="flex flex-column col-6 mb-2">
+      <label for="attivo">Abilitato CRM</label>
+      <Checkbox
+        id="attivo"
+        :binary="true"
+        v-model="tmpUser.enabled_crm"
+      ></Checkbox>
+    </div>
+    <div class="flex flex-column col-6 mb-2">
+      <label for="attivo">Abilitato GEST</label>
+      <Checkbox
+        id="attivo"
+        :binary="true"
+        v-model="tmpUser.enabled_gestionale"
+      ></Checkbox>
+    </div>
+    <div class="flex flex-column col-12 mb-2">
+      <label>Assegnazione Lead</label>
+      <Checkbox :binary="true" v-model="tmpUser.assegnazione_lead"></Checkbox>
+    </div>
     <div class="flex flex-column col-12 col-md-6 mb-2">
       <label for="nome">Nome</label>
       <InputText
@@ -69,7 +89,7 @@
       </InputText>
     </div>
     <div class="flex flex-column col-12 col-md-6 mb-2">
-      <label for="email">Email</label>
+      <label>Email Aziendale</label>
       <InputText
         :class="{ 'red-border': saveDisabled }"
         id="email"
@@ -79,11 +99,19 @@
       </InputText>
     </div>
     <div class="flex flex-column col-12 col-md-6 mb-2">
-      <label for="email">Permalink</label>
+      <label>Email personale</label>
+      <InputText type="text" v-model="tmpUser.emailPersonale"> </InputText>
+    </div>
+    <div class="flex flex-column col-12 col-md-6 mb-2">
+      <label>PEC</label>
+      <InputText type="text" v-model="tmpUser.pec"> </InputText>
+    </div>
+    <div class="flex flex-column col-12 col-md-6 mb-2">
+      <label>Permalink</label>
       <InputText type="text" v-model="tmpUser.permalink"> </InputText>
     </div>
     <div class="flex flex-column col-12 col-md-6 mb-2">
-      <label for="email">Numero VoiSpeed</label>
+      <label>Numero VoiSpeed</label>
       <InputText type="text" v-model="tmpUser.numero_voispeed"> </InputText>
     </div>
     <div class="flex flex-column col-12 col-md-6 mb-2">
@@ -212,6 +240,58 @@
       >
       </MultiSelect>
     </div>
+    <div class="flex flex-column col-12 col-md-6 mb-2">
+      <label>Precaricato CQS</label>
+      <InputNumber
+        type="number"
+        v-model="tmpUser.precaricato_cqs"
+      ></InputNumber>
+    </div>
+    <div class="flex flex-column col-12 col-md-6 mb-2">
+      <label for="datanascita">Data iscrizione OAM</label>
+      <Calendar type="text" v-model="tmpUser.dataIscrizioneOam"></Calendar>
+    </div>
+    <div class="flex flex-column col-12 col-md-6 mb-2">
+      <label>Codice Ateco</label>
+      <InputText type="text" v-model="tmpUser.codiceAteco"> </InputText>
+    </div>
+    <div class="flex flex-column col-12 col-md-6 mb-2">
+      <label>Certificati Pen</label>
+      <InputText type="text" v-model="tmpUser.certificatiPen"> </InputText>
+    </div>
+
+    <div class="flex flex-column col-12 col-md-6 mb-2">
+      <label>Titolo Studio</label>
+      <InputText type="text" v-model="tmpUser.titoloStudio"> </InputText>
+    </div>
+
+    <div class="flex flex-column col-12 col-md-6 mb-2">
+      <label>Residenza</label>
+      <InputText type="text" v-model="tmpUser.residenza"> </InputText>
+    </div>
+
+    <div class="flex flex-column col-12 col-md-6 mb-2">
+      <label>Sede Operativa</label>
+      <InputText type="text" v-model="tmpUser.sedeOperativa"> </InputText>
+    </div>
+
+    <div class="flex flex-column col-12 col-md-6 mb-2">
+      <label>CAP</label>
+      <InputText type="text" v-model="tmpUser.cap"> </InputText>
+    </div>
+
+    <div class="flex flex-column col-12 col-md-6 mb-2">
+      <label>Città</label>
+      <InputText type="text" v-model="tmpUser.citta"> </InputText>
+    </div>
+    <div class="flex flex-column col-12 col-md-6 mb-2">
+      <label>Provincia</label>
+      <InputText type="text" v-model="tmpUser.provincia"> </InputText>
+    </div>
+    <div class="flex flex-column col-12 col-md-6 mb-2">
+      <label>Regione</label>
+      <InputText type="text" v-model="tmpUser.regione"> </InputText>
+    </div>
     <div class="flex align-items-center col-12">
       <div class="flex flex-column col-12 col-md-6 mb-2">
         <label>Nome Documento</label>
@@ -243,85 +323,85 @@
   </div>
 </template>
 <script setup>
-import { ref, defineEmits, defineProps, computed } from "vue";
-import { useToast } from "primevue/usetoast";
-import AxiosService from "@/axiosServices/AxiosService";
-import UserFormSkeleton from "../skeletons/UserFormSkeleton.vue";
+import { ref, defineEmits, defineProps, computed } from "vue"
+import { useToast } from "primevue/usetoast"
+import AxiosService from "@/axiosServices/AxiosService"
+import UserFormSkeleton from "../skeletons/UserFormSkeleton.vue"
 
-const emits = defineEmits(["event_HideUsersSidebar", "event_refreshList"]);
+const emits = defineEmits(["event_HideUsersSidebar", "event_refreshList"])
 
 const props = defineProps({
   sidebarVisible: Boolean,
   sidebarData: Object,
-});
+})
 
-const tmpUser = ref({ ...props.sidebarData.event });
+const tmpUser = ref({ ...props.sidebarData.event })
 // tmpUser.value.password = 'PrestitoSi'
 // tmpUser.value.livelliAbilitati = [3]
-const toast = useToast();
-const servicePOST = new AxiosService(props.sidebarData.view.endpointPOST);
-const servicePUT = new AxiosService(props.sidebarData.view.endpointPUT);
+const toast = useToast()
+const servicePOST = new AxiosService(props.sidebarData.view.endpointPOST)
+const servicePUT = new AxiosService(props.sidebarData.view.endpointPUT)
 
-const isSending = ref(false);
-const file = ref(null);
+const isSending = ref(false)
+const file = ref(null)
 function uploadFileAvatar() {
   console.log(
     "🚀 ~ file: UsersSidebar.vue ~ line 120 ~ uploadFile ~ ev",
     file.value.files
-  );
+  )
 
-  const service = new AxiosService("files");
+  const service = new AxiosService("files")
   if (!isSending.value) {
-    isSending.value = true;
+    isSending.value = true
 
-    const formData = new FormData();
-    formData.append("file", file.value.files[0]);
+    const formData = new FormData()
+    formData.append("file", file.value.files[0])
 
     service
       .postCustomEndpoint("Upload?type=" + "UserAvatars", "", formData)
       .then((res) => {
         // eslint-disable-next-line vue/no-mutating-props
         tmpUser.value.imgprofilo =
-          "https://prestitosi-core.datarete.cloud/" + res;
+          "https://prestitosi-core.datarete.cloud/" + res
       })
       .finally(() => {
-        isSending.value = false;
-      });
+        isSending.value = false
+      })
   }
-  return;
+  return
 }
 
-const titoloDocumento = ref("");
-const urlFile = ref("");
+const titoloDocumento = ref("")
+const urlFile = ref("")
 function uploadFileDocumento(ev) {
-  loading.value = true;
-  urlFile.value = "";
-  const service = new AxiosService("files");
+  loading.value = true
+  urlFile.value = ""
+  const service = new AxiosService("files")
   for (let i = 0; i < ev.files.length; i++) {
-    const formData = new FormData();
-    formData.append("file", ev.files[i]);
+    const formData = new FormData()
+    formData.append("file", ev.files[i])
     service
       .postCustomEndpoint("Upload?type=" + "UsersFiles", "", formData)
       .then((res) => {
         console.log(
           "🚀 ~ file: UsersSidebar.vue ~ line 203 ~ uploadFileDocumento ~ res",
           res
-        );
-        urlFile.value = res;
+        )
+        urlFile.value = res
       })
       .finally(() => {
         tmpUser.value.files.push({
           nome: titoloDocumento.value,
           url: urlFile.value,
-        });
-        loading.value = false;
-      });
+        })
+        loading.value = false
+      })
   }
 }
 
-const formLoading = ref(false);
+const formLoading = ref(false)
 function save() {
-  formLoading.value = true;
+  formLoading.value = true
   if (tmpUser.value.id) {
     servicePUT
       .update(tmpUser.value)
@@ -332,9 +412,9 @@ function save() {
             summary: "Nuova Opzione Creata",
             detail: tmpUser.value.nome,
             life: 3000,
-          });
-          emits("event_refreshList");
-          emits("event_HideUsersSidebar");
+          })
+          emits("event_refreshList")
+          emits("event_HideUsersSidebar")
         }
       })
       .catch((error) => {
@@ -343,15 +423,15 @@ function save() {
           summary: "'Errore nella modifica dell'opzione",
           detail: error,
           life: 3000,
-        });
-        emits("event_refreshList");
-        emits("event_HideUsersSidebar");
+        })
+        emits("event_refreshList")
+        emits("event_HideUsersSidebar")
       })
       .finally(() => {
-        formLoading.value = false;
-      });
+        formLoading.value = false
+      })
   } else {
-    console.log("POST , ");
+    console.log("POST , ")
     servicePOST
       .create(tmpUser.value)
       .then((res) => {
@@ -361,9 +441,9 @@ function save() {
             summary: "Nuova Opzione Creata",
             detail: tmpUser.value.nome,
             life: 3000,
-          });
-          emits("event_refreshList");
-          emits("event_HideUsersSidebar");
+          })
+          emits("event_refreshList")
+          emits("event_HideUsersSidebar")
         }
       })
       .catch((error) => {
@@ -372,74 +452,74 @@ function save() {
           summary: "'Errore nella creazione dell'opzione",
           detail: error,
           life: 3000,
-        });
-        emits("event_refreshList");
-        emits("event_HideUsersSidebar");
+        })
+        emits("event_refreshList")
+        emits("event_HideUsersSidebar")
       })
       .finally(() => {
-        formLoading.value = false;
-      });
+        formLoading.value = false
+      })
   }
 }
 
-const serviceGETLoginLevels = new AxiosService("Options/GetLoginLevels");
-const loginLevelOptions = ref([]);
-const loadingLoginLevels = ref(true);
+const serviceGETLoginLevels = new AxiosService("Options/GetLoginLevels")
+const loginLevelOptions = ref([])
+const loadingLoginLevels = ref(true)
 function getLoginLevels() {
-  loadingLoginLevels.value = true;
+  loadingLoginLevels.value = true
   serviceGETLoginLevels
     .read()
     .then((res) => {
       loginLevelOptions.value.length > 0
         ? loginLevelOptions.value.splice(0)
-        : null;
+        : null
       res.map((x) => {
-        x.Id = x.value;
-        x.Nome = x.text;
-        delete x.value;
-        delete x.text;
-      });
-      loginLevelOptions.value = res;
+        x.Id = x.value
+        x.Nome = x.text
+        delete x.value
+        delete x.text
+      })
+      loginLevelOptions.value = res
     })
     .catch((err) => console.log(err))
-    .finally(() => (loadingLoginLevels.value = false));
+    .finally(() => (loadingLoginLevels.value = false))
 }
 
-const serviceGETSedi = new AxiosService("Gestione/SediAzienda/GetSedi");
-const sediOptions = ref([]);
-const loadingSedi = ref(true);
+const serviceGETSedi = new AxiosService("Gestione/SediAzienda/GetSedi")
+const sediOptions = ref([])
+const loadingSedi = ref(true)
 function getSedi() {
-  loadingSedi.value = true;
+  loadingSedi.value = true
   serviceGETSedi
     .read()
     .then((res) => {
-      sediOptions.value.length > 0 ? sediOptions.value.splice(0) : null;
+      sediOptions.value.length > 0 ? sediOptions.value.splice(0) : null
 
-      sediOptions.value = res;
+      sediOptions.value = res
     })
     .catch((err) => console.log(err))
-    .finally(() => (loadingSedi.value = false));
+    .finally(() => (loadingSedi.value = false))
 }
 
-const serviceGETUsers = new AxiosService("Options/GetUsers");
-const usersOptions = ref([]);
-const loadingUsers = ref(true);
+const serviceGETUsers = new AxiosService("Options/GetUsers")
+const usersOptions = ref([])
+const loadingUsers = ref(true)
 function getUsers() {
-  loadingUsers.value = true;
+  loadingUsers.value = true
   serviceGETUsers
     .read()
     .then((res) => {
-      usersOptions.value.length > 0 ? usersOptions.value.splice(0) : null;
+      usersOptions.value.length > 0 ? usersOptions.value.splice(0) : null
       res.map((x) => {
-        x.Id = x.value;
-        x.Nome = x.text;
-        delete x.value;
-        delete x.text;
-      });
-      usersOptions.value = res;
+        x.Id = x.value
+        x.Nome = x.text
+        delete x.value
+        delete x.text
+      })
+      usersOptions.value = res
     })
     .catch((err) => console.log(err))
-    .finally(() => (loadingUsers.value = false));
+    .finally(() => (loadingUsers.value = false))
 }
 
 const saveDisabled = computed(() => {
@@ -451,25 +531,25 @@ const saveDisabled = computed(() => {
       !tmpUser.value.username ||
       !tmpUser.value.livelliAbilitati
     ) {
-      return true;
+      return true
     } else {
-      return false;
+      return false
     }
   } else {
-    return true;
+    return true
   }
-});
+})
 
-const loadingProdotti = ref(true);
-const prodottiOptions = ref([]);
+const loadingProdotti = ref(true)
+const prodottiOptions = ref([])
 function getProdottiAbilitati() {
-  loadingProdotti.value = true;
-  const service = new AxiosService("Options/TipiProdotto");
+  loadingProdotti.value = true
+  const service = new AxiosService("Options/TipiProdotto")
   service
     .read()
     .then((res) => (prodottiOptions.value = res))
     .catch((err) => console.log(err))
-    .finally(() => (loadingProdotti.value = false));
+    .finally(() => (loadingProdotti.value = false))
 }
 
 const loading = computed(() => {
@@ -479,10 +559,10 @@ const loading = computed(() => {
     !loadingSedi.value &&
     !loadingUsers.value
   ) {
-    return false;
+    return false
   }
-  return true;
-});
+  return true
+})
 
 const bancheOptions = [
   {
@@ -565,13 +645,13 @@ const bancheOptions = [
     Prestiti: true,
     CDQ: true,
   },
-];
+]
 
-getProdottiAbilitati();
+getProdottiAbilitati()
 
-getLoginLevels();
+getLoginLevels()
 
-getSedi();
+getSedi()
 
-getUsers();
+getUsers()
 </script>

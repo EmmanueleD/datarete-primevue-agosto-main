@@ -15,20 +15,28 @@
             ></Dropdown>
           </div>
           <i class="pi-spin pi spinner" v-if="loading"></i>
+
           <div class="flex flex-column align-items-end">
-            <FileUpload
-              :disabled="statiSelected == 0"
-              @uploader="uploadFile2"
-              mode="basic"
-              uploadIcon="pi pi-paperclip"
-              name="demo[]"
-              :customUpload="true"
-              :previewWidth="50"
-              :maxFileSize="1000000"
-              chooseLabel="Upload"
-              :auto="true"
-              :loading="loadingUpload"
-            />
+            <div class="flex justify-content-between">
+              <Button
+                class="mr-2"
+                label="Scarica modello"
+                @click="downlodModelloLead"
+              ></Button>
+              <FileUpload
+                :disabled="statiSelected == 0"
+                @uploader="uploadFile2"
+                mode="basic"
+                uploadIcon="pi pi-paperclip"
+                name="demo[]"
+                :customUpload="true"
+                :previewWidth="50"
+                :maxFileSize="1000000"
+                chooseLabel="Upload"
+                :auto="true"
+                :loading="loadingUpload"
+              />
+            </div>
             <span v-if="statiSelected == 0" class="text-red-500"
               >Seleziona uno stato poter eseguire un'importazione</span
             >
@@ -94,6 +102,12 @@ function eseguiLImportazione() {
     .finally(() => {
       loadingImport.value = false;
     });
+}
+
+function downlodModelloLead() {
+  window.open(
+    "https://prestitosi-core.datarete.cloud/Drive/_COMMON/DataReteCore_ModelloLead.xlsx"
+  );
 }
 
 const statiOptions = ref([]);

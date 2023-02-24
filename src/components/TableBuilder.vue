@@ -26,6 +26,7 @@ const props = defineProps({
 const emit = defineEmits([
   "event_editRowItem",
   "event_ShowSidebar_eye",
+  "event_ShowSidebar_elimina",
   "onPage",
   "onSort",
   "onRowSelect",
@@ -170,6 +171,10 @@ function getBadgeColor(value, colors) {
 
 const selectedProducts = ref();
 
+const isGenny = ref(false);
+
+isGenny.value = store.getters["loggedUser"].id == 111 ? true : false;
+
 defineExpose({
   selectedProducts,
 });
@@ -221,15 +226,15 @@ defineExpose({
             dataKey="ID"
             :loading="config.loading"
           >
-            <!-- <template #header>
-              <div style="text-align: right">
+            <template #header>
+              <div v-if="isGenny" style="text-align: right">
                 <Button
                   icon="pi pi-external-link"
                   label="Export"
                   @click="exportCSV($event)"
                 />
               </div>
-            </template> -->
+            </template>
             <Column
               :frozen="true"
               style="min-width: 10px; max-width: 100px"
@@ -249,6 +254,12 @@ defineExpose({
                     role="button"
                     class="pi pi-fw pi-eye"
                     @click="$emit('event_ShowSidebar_eye', data)"
+                  ></i>
+                  <i
+                    v-if="store.getters['loggedUser'].id == 111"
+                    class="ml-2 pi pi-fw pi-trash"
+                    role="button"
+                    @click="$emit('event_ShowSidebar_elimina', data)"
                   ></i>
                   <!-- <i role="button" class="ml-3 pi pi-fw pi-cog" @click="toggle($event, data)" aria-haspopup="true"
                     aria-controls="overlay_tmenu"></i> -->
@@ -319,7 +330,25 @@ defineExpose({
                 </div>
 
                 <div v-else>
-                  <span v-if="col.type == 'Date'">
+                  <span
+                    v-if="
+                      col.type == 'Date' &&
+                      (col.field == 'DATA_CREAZIONE' ||
+                        col.field == 'DATA_MODIFICA')
+                    "
+                  >
+                    {{
+                      new Date(data[col.field]).toLocaleDateString("it", {
+                        year: "2-digit",
+                        month: "2-digit",
+                        day: "2-digit",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })
+                    }}</span
+                  >
+
+                  <span v-else-if="col.type == 'Date'">
                     {{ formatDate(data[col.field]) }}</span
                   >
 

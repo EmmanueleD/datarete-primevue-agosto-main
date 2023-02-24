@@ -1,28 +1,83 @@
 <template>
   <div class="wrapper">
     <h1>{{ pageTitle }}</h1>
-    <TableBuilder
-      @event_ShowSidebar_nuovoAppuntamento="$router.push('/eventi')"
-      @event_ShowSidebar_creaPratica="null"
-      @event_ShowSidebar_eye="apriDettaglioPratica"
-      @event_ShowSidebar_elimina="null"
-      :data="tableItems"
-      :headersConfig="columns"
-      :showAzioni="true"
-      :config="config"
+
+    <DataTable
+      :value="tableItems"
+      stripedRows
+      :paginator="true"
+      :rows="10"
+      paginatorTemplate="CurrentPageReport FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink "
+      :scrollable="true"
+      table-layout="auto"
+      :loading="loading"
+      dataKey="id"
+      v-model:filters="filters"
+      filterDisplay="menu"
     >
-    </TableBuilder>
+      <template #loading> Caricamento in corso... </template>
+      <Column field="azioni" header="Azioni">
+        <template #body="{ data }">
+          <i
+            class="pi pi-eye ml-4 cursor-pointer"
+            @click="apriDettaglioPratica(data)"
+          ></i>
+        </template>
+      </Column>
+      <Column
+        v-for="column in columns"
+        :key="column.order"
+        :field="column.field"
+        :header="column.header"
+      >
+        <template #filter="{ filterModel }">
+          <InputText
+            type="text"
+            v-model="filterModel.value"
+            class="p-column-filter"
+          />
+        </template>
+        <template #body="{ data }">
+          <div class="w-full">
+            <span v-if="column.type == 'Date'">{{
+              new Date(data[column.field]).toLocaleDateString("it", {
+                year: "numeric",
+                month: "short",
+                day: "2-digit",
+                hour: "2-digit",
+                minute: "2-digit",
+              })
+            }}</span>
+            <span
+              v-else-if="
+                column.field == 'importo' || column.field == 'importoRata'
+              "
+              >{{
+                data[column.field].toLocaleString("it", {
+                  style: "currency",
+                  currency: "EUR",
+                })
+              }}</span
+            >
+
+            <span v-else>{{ data[column.field] }}</span>
+            <!-- <span>{{ column }}</span> -->
+          </div>
+        </template>
+      </Column>
+    </DataTable>
   </div>
 </template>
 
 <script setup>
-import { ref } from "vue";
-import { useRouter } from "vue-router";
-import AxiosService from "@/axiosServices/AxiosService";
+import { ref } from "vue"
+import { useRouter } from "vue-router"
+import AxiosService from "@/axiosServices/AxiosService"
+import { FilterMatchMode, FilterOperator } from "primevue/api"
 
-// IMPORT COMPONENTS
-import TableBuilder from "../../components/TableBuilder.vue";
-const router = useRouter();
+const router = useRouter()
+const loading = ref(false)
+
 const columns = [
   {
     field: "Cliente",
@@ -105,44 +160,55 @@ const columns = [
     frozen: false,
     sortable: false,
   },
-];
+]
 
-const tableItems = ref([]);
+const tableItems = ref([])
 
-// TABLE BUILDER
-const config = ref({
-  zebra: true,
-  menuItems: [
-    // {
-    //   label: 'Inserisci',
-    //   icon: "pi pi-fw pi-plus",
-    //   items: [
-    //     {
-    //       label: "Nuova Anagrafica",
-    //       command: () => { nuovaAnagraficaVisible.value = true }
-    //     },
-    //   ]
-    // },
-    // {
-    //   label: 'Viste',
-    //   icon: 'pi pi-fw pi-file',
-    //   items: []
-    // }
-  ],
-});
-
-let pageTitle = ref("Bozze");
+let pageTitle = ref("Bozze")
 
 function getData() {
-  const service = new AxiosService("Pratiche/GetPraticheBozze");
-  service.create({}).then((res) => {
-    tableItems.value = res;
-  });
+  loading.value = true
+  const service = new AxiosService("Pratiche/GetPraticheBozze")
+  service
+    .create({})
+    .then((res) => {
+      tableItems.value = res
+    })
+    .finally(() => {
+      loading.value = false
+    })
 }
 
 function apriDettaglioPratica(event) {
-  router.push("/pratiche/dettaglio-pratica/" + event.id);
+  router.push("/pratiche/dettaglio-pratica/" + event.id)
 }
 
-getData();
+const filters = ref({
+  global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  name: {
+    operator: FilterOperator.AND,
+    constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }],
+  },
+  "country.name": {
+    operator: FilterOperator.AND,
+    constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }],
+  },
+  representative: { value: null, matchMode: FilterMatchMode.IN },
+  date: {
+    operator: FilterOperator.AND,
+    constraints: [{ value: null, matchMode: FilterMatchMode.DATE_IS }],
+  },
+  balance: {
+    operator: FilterOperator.AND,
+    constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }],
+  },
+  status: {
+    operator: FilterOperator.OR,
+    constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }],
+  },
+  activity: { value: null, matchMode: FilterMatchMode.BETWEEN },
+  verified: { value: null, matchMode: FilterMatchMode.EQUALS },
+})
+
+getData()
 </script>

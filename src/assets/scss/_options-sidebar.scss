@@ -1,38 +1,38 @@
 .options-sidebar {
-    width              : $optionsSidebarWidth;
-    height             : calc(100% - 50px);
-    background-color   : #FFF;
-    position           : fixed;
-    top                : 0;
-    right              : -$optionsSidebarWidth;
-    margin-top         : 50px;
-    transition         : right .3s ease-in-out;
-    z-index            : 800;
-    overflow           : hidden;
-    overflow-y         : auto;
-    box-shadow         : 0 0px 8px 0 rgba(0, 0, 0, 0.4);
-    padding            : 2rem 1rem;
-    visibility         : visible;
-    animation          : visibility-delay .1s;
-    animation-delay    : 1s;
-    animation-fill-mode: forwards;
+  width: $optionsSidebarWidth;
+  height: calc(100% - 50px);
+  background-color: #fff;
+  position: fixed;
+  top: 0;
+  right: -$optionsSidebarWidth;
+  margin-top: 50px;
+  transition: right 0.3s ease-in-out;
+  z-index: 800;
+  overflow: hidden;
+  overflow-y: auto;
+  box-shadow: 0 0px 8px 0 rgba(0, 0, 0, 0.4);
+  padding: 2rem 1rem;
+  visibility: visible;
+  animation: visibility-delay 0.1s;
+  animation-delay: 1s;
+  animation-fill-mode: forwards;
 
-    &.show {
-        animation : none;
-        visibility: visible;
-        right     : 0;
-    }
+  &.show {
+    animation: none;
+    visibility: visible;
+    right: 0;
+  }
 }
 
-.avatar-container{
+.avatar-container {
   position: relative;
 }
 
-.custom-file-input{
+.custom-file-input {
   display: none;
 }
 
-.custom-file-input-label{
+.custom-file-input-label {
   background-color: #c1c2c3;
   color: white;
   border-radius: 50%;
@@ -46,6 +46,6 @@
   right: -12px;
 }
 
-p-sidebar{
+p-sidebar {
   padding-bottom: 300px;
 }

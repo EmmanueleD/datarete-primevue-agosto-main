@@ -1,14 +1,25 @@
 <template>
   <div class="sidebar no-scrollbar">
-    <div class="sidebar-header d-flex justify-content-between align-items-center">
-      <div class="logo-image"><img style="width: 172px;margin-top:15px"
-          src="https://prestitosifinance.it/wp-content/uploads/2022/09/PRESTITOSI.png"></div><i
-        class="double-arrow left"></i>
+    <div
+      class="sidebar-header d-flex justify-content-between align-items-center"
+    >
+      <div class="logo-image">
+        <img
+          style="width: 172px; margin-top: 15px"
+          src="https://prestitosifinance.it/wp-content/uploads/2022/09/PRESTITOSI.png"
+        />
+      </div>
+      <i @click="$emit('menu-toggle')" class="double-arrow left"></i>
     </div>
 
     <div v-for="(group, i) of model" :key="i">
       <div class="sidebar-group-lable">{{ group.group }}</div>
-      <AppSubmenu :items="group.items" class="layout-menu" :root="true" @menuitem-click="onMenuItemClick" />
+      <AppSubmenu
+        :items="group.items"
+        class="layout-menu"
+        :root="true"
+        @menuitem-click="onMenuItemClick"
+      />
     </div>
   </div>
 </template>

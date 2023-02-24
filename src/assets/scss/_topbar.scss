@@ -1,20 +1,20 @@
 .topbar {
   background-color: #fff;
-  padding         : 0 .8rem;
-  height          : 50px;
-  position        : fixed;
-  top             : 0;
-  right           : 0;
-  width           : 100%;
-  transition      : width 0.4s ease-out;
-  z-index         : 1002;
+  padding: 0 0.8rem;
+  height: 50px;
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 100%;
+  transition: width 0.4s ease-out;
+  z-index: 1002;
 
   .p-button.p-button-text.p-button-plain {
     color: #fff;
 
     &:enabled:hover {
       background: none;
-      color     : #ddd;
+      color: #ddd;
     }
 
     &:focus {
@@ -25,6 +25,95 @@
       box-shadow: 0 0 0 1px #a2d5fc;
     }
   }
+}
+
+.prestitosi-topbar {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 100%;
+  transition: width 0.4s ease-out;
+  z-index: 1002;
+
+  .p-button.p-button-text.p-button-plain {
+    color: #fff;
+
+    &:enabled:hover {
+      background: none;
+      color: #ddd;
+    }
+
+    &:focus {
+      box-shadow: none;
+    }
+
+    &:focus-visible {
+      box-shadow: 0 0 0 1px #a2d5fc;
+    }
+  }
+
+  background-color: #0e3996;
+  color: #fff;
+  height: 95px;
+}
+
+.prestitosi-top-subbar {
+  background-color: #172852;
+  border-bottom: 1px solid #83a4eb;
+  padding: 5px 1rem;
+  &-item:hover {
+    cursor: pointer;
+    color: #ffee00;
+  }
+}
+
+.prestitosi-bottom-subbar {
+  padding: 5px 1rem;
+}
+
+.prestitosi-menubar .p-menubar {
+  height: 50px;
+  border: none;
+  background-color: #0e3996;
+  color: #fff;
+}
+
+.prestitosi-menubar
+  .p-menubar
+  .p-menubar-root-list
+  > .p-menuitem
+  > .p-menuitem-link
+  .p-menuitem-icon {
+  display: grid;
+  place-content: center;
+  color: #ffee00;
+  font-size: 2rem;
+}
+
+.prestitosi-menubar .p-menubar .p-menuitem a:hover {
+  background-color: #ffee00 !important;
+  span {
+    color: #0e3996 !important;
+  }
+}
+
+.prestitosi-menubar .p-menubar .p-menuitem-active a {
+  background-color: #ffee00 !important;
+  span {
+    color: #0e3996 !important;
+  }
+}
+
+.prestitosi-menubar .p-menubar .p-menuitem-active .p-submenu-list li a {
+  background-color: #fff !important;
+}
+
+.prestitosi-menubar .p-menubar .p-menuitem-active .p-submenu-list li a:hover {
+  background-color: #ececec !important;
+}
+
+.pi-angle-down {
+  display: none;
 }
 
 @media (min-width: $desktopBreakpoint) {

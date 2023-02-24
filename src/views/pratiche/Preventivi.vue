@@ -1,45 +1,65 @@
 <template>
   <div class="wrapper">
-    <h1 v-if="headerVisible">{{
-    pageTitle
-}}</h1>
+    <h1 v-if="headerVisible">{{ pageTitle }}</h1>
 
-    <div v-if="searchVisible" class=" flex justify-content-between align-items-center  mb-4">
-
+    <div
+      v-if="searchVisible"
+      class="flex justify-content-between align-items-center mb-4"
+    >
       <Card class="w-100">
         <template #content>
           <div class="w-100 flex justify-content-between align-items-center">
-
-
-
-
             <span class="p-input-icon-left">
               <i class="pi pi-search" />
-              <InputText v-model="filtersObj['global'].value" placeholder="Cerca..." />
+              <InputText
+                v-model="filtersObj['global'].value"
+                placeholder="Cerca..."
+              />
             </span>
-
-
           </div>
         </template>
       </Card>
     </div>
 
-    <DataTable class="mb-4" :value="tableItems" :stripedRows="true" :loading="loading" :paginator="true" :rows="10"
-      :globalFilterFields="globalFilters">
+    <DataTable
+      class="mb-4"
+      :value="tableItems"
+      :stripedRows="true"
+      :loading="loading"
+      :paginator="true"
+      :rows="10"
+      :globalFilterFields="globalFilters"
+    >
       <Column header="Azioni">
         <template #body="{ data }">
-          <div class="w-full flex ">
-            <i @click="goToPreventivatore(data)" class="pi pi-window-maximize cursor-pointer mr-4"></i>
-            <i @click="generaPDF(data)" class="pi pi-print cursor-pointer mr-4"></i>
+          <div class="w-full flex">
+            <i
+              @click="goToPreventivatore(data)"
+              class="pi pi-window-maximize cursor-pointer mr-4"
+            ></i>
+            <!-- <i
+              @click="generaPDF(data)"
+              class="pi pi-print cursor-pointer mr-4"
+            ></i> -->
             <i class="pi pi-trash cursor-pointer"></i>
           </div>
         </template>
       </Column>
-      <Column v-for="column in columns" :key="column.field" :field="column.field" :header="column.header"
-        :sortable="column.sortable">
+      <Column
+        v-for="column in columns"
+        :key="column.field"
+        :field="column.field"
+        :header="column.header"
+        :sortable="column.sortable"
+      >
         <template #body="{ data }">
-          <div v-if="(column.field == 'data_inserimento' || column.field == 'data_ultimo_stato')">
-            {{ new Date(data[column.field]).toLocaleDateString('it') }}
+          <div
+            v-if="
+              column.field == 'data_inserimento' ||
+              column.field == 'data_ultimo_stato'
+            "
+          >
+            {{ new Date(data[column.field]).toLocaleDateString("it") }}
           </div>
           <div v-else>
             {{ data[column.field] }}
@@ -51,25 +71,32 @@
           {{ data.tipo_preventivatore }} {{ data.tipoRapporto }}
         </template>
       </Column>
-      <Column field="numeroRisultati" header="Numero Risultati" :sortable="true"></Column>
+      <Column
+        field="numeroRisultati"
+        header="Numero Risultati"
+        :sortable="true"
+      ></Column>
       <Column field="dataCreazione" header="Data di creazione" :sortable="true">
         <template #body="{ data }">
-          {{ new Date(data.dataCreazione).toLocaleString('it', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit'
-  })
-}}
+          {{
+            new Date(data.dataCreazione).toLocaleString("it", {
+              year: "numeric",
+              month: "2-digit",
+              day: "2-digit",
+              hour: "2-digit",
+              minute: "2-digit",
+            })
+          }}
         </template>
       </Column>
     </DataTable>
 
-
-
-    <Dialog v-model:visible="modalVisible" position="right" :breakpoints="{ '960px': '400px', '640px': '300px' }"
-      :style="{ width: '400px' }"></Dialog>
+    <Dialog
+      v-model:visible="modalVisible"
+      position="right"
+      :breakpoints="{ '960px': '400px', '640px': '300px' }"
+      :style="{ width: '400px' }"
+    ></Dialog>
 
     <!-- <Dialog class="mr-4" :header="tmpItem.Denominazione_istituto" v-model:visible="modalVisible" position="right"
       :breakpoints="{ '960px': '400px', '640px': '300px' }" :style="{ width: '400px' }">
@@ -140,21 +167,15 @@
         </div>
       </div>
     </Dialog> -->
-
-
-
-
-
   </div>
-
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { FilterMatchMode } from "primevue/api";
-import AxiosService from '@/axiosServices/AxiosService';
-import { jsPDF } from "jspdf";
-import { useRouter } from 'vue-router';
+import { ref } from "vue"
+import { FilterMatchMode } from "primevue/api"
+import AxiosService from "@/axiosServices/AxiosService"
+import { jsPDF } from "jspdf"
+import { useRouter } from "vue-router"
 
 const loading = ref(false)
 const router = useRouter()
@@ -162,40 +183,41 @@ const router = useRouter()
 // eslint-disable-next-line no-undef, no-unused-vars
 const props = defineProps({
   idAnagrafica: {
-    default: '0',
-    type: String
+    default: "0",
+    type: String,
   },
   headerVisible: {
     default: true,
-    type: Boolean
+    type: Boolean,
   },
   searchVisible: {
     default: true,
-    type: Boolean
-  }
+    type: Boolean,
+  },
 })
 
 let filtersObj = ref({
   global: {
-    value: '',
-    matchMode: FilterMatchMode.CONTAINS
-  }
+    value: "",
+    matchMode: FilterMatchMode.CONTAINS,
+  },
 })
 
-const globalFilters = [
-  'nomeCliente', 'agente', 'Tipo', 'numeroRisultati'
-]
+const globalFilters = ["nomeCliente", "agente", "Tipo", "numeroRisultati"]
 
 function goToPreventivatore(preventivo) {
   switch (preventivo.tipo_preventivatore) {
-    case 'mutuo':
-      router.push('/pratiche/preventivo-mutuo/0/' + preventivo.id)
+    case "mutuo":
+      router.push("/pratiche/preventivo-mutuo/0/" + preventivo.id)
       break
-    case 'prestito':
-      router.push('/pratiche/preventivo-prestito/0/' + preventivo.id)
+    case "prestito":
+      router.push("/pratiche/preventivo-prestito/0/" + preventivo.id)
       break
-    case 'cqs':
-      router.push('/pratiche/preventivo-cqs/0/' + preventivo.id)
+    case "cqs":
+      router.push("/pratiche/preventivo-cqs/0/" + preventivo.id)
+      break
+    case "delega":
+      router.push("/pratiche/preventivo-delega/0/" + preventivo.id)
       break
   }
 }
@@ -211,46 +233,69 @@ function generaPDF(data) {
   // nome_cliente
   // ultimo_stato
 
-  const doc = new jsPDF();
+  const doc = new jsPDF()
 
-  doc.setFontSize(22);
-  doc.setFont("helvetica", "bold");
-  doc.text("Preventivo numero " + data.id.toString(), 105, 20, null, null, "center");
-  doc.setFontSize(16);
-  doc.setFont("helvetica", "normal");
-  doc.text('- PrestitoSi -', 105, 30, null, null, 'center');
+  doc.setFontSize(22)
+  doc.setFont("helvetica", "bold")
+  doc.text(
+    "Preventivo numero " + data.id.toString(),
+    105,
+    20,
+    null,
+    null,
+    "center"
+  )
+  doc.setFontSize(16)
+  doc.setFont("helvetica", "normal")
+  doc.text("- PrestitoSi -", 105, 30, null, null, "center")
   doc.line(20, 40, 190, 41)
 
-  doc.setFontSize(16);
-  doc.setFont("helvetica", "bold");
-  doc.text("Nome Cliente: ", 20, 50);
-  doc.setFont("helvetica", "normal");
-  doc.text(data.nome_cliente, 100, 50, null, null, 'right');
+  doc.setFontSize(16)
+  doc.setFont("helvetica", "bold")
+  doc.text("Nome Cliente: ", 20, 50)
+  doc.setFont("helvetica", "normal")
+  doc.text(data.nome_cliente, 100, 50, null, null, "right")
 
-  doc.setFontSize(16);
-  doc.setFont("helvetica", "bold");
-  doc.text("Nome Agente: ", 20, 60);
-  doc.setFont("helvetica", "normal");
-  doc.text(data.nome_agente, 100, 60, null, null, 'right');
+  doc.setFontSize(16)
+  doc.setFont("helvetica", "bold")
+  doc.text("Nome Agente: ", 20, 60)
+  doc.setFont("helvetica", "normal")
+  doc.text(data.nome_agente, 100, 60, null, null, "right")
 
-  doc.setFontSize(16);
-  doc.setFont("helvetica", "bold");
-  doc.text("Importo richiesto: ", 20, 70);
-  doc.setFont("helvetica", "normal");
-  doc.text(data.importo_richiesto.toString(), 100, 70, null, null, 'right');
+  doc.setFontSize(16)
+  doc.setFont("helvetica", "bold")
+  doc.text("Importo richiesto: ", 20, 70)
+  doc.setFont("helvetica", "normal")
+  doc.text(data.importo_richiesto.toString(), 100, 70, null, null, "right")
 
-  doc.setFontSize(16);
-  doc.setFont("helvetica", "bold");
-  doc.text("Ultimo Stato: ", 20, 80);
-  doc.setFont("helvetica", "normal");
-  doc.text(data.ultimo_stato, 100, 80, null, null, 'right');
+  doc.setFontSize(16)
+  doc.setFont("helvetica", "bold")
+  doc.text("Ultimo Stato: ", 20, 80)
+  doc.setFont("helvetica", "normal")
+  doc.text(data.ultimo_stato, 100, 80, null, null, "right")
 
-  doc.save("a4.pdf");
+  doc.save("a4.pdf")
 }
 
 const columns = [
-  { field: 'nomeCliente', header: "Nome Cliente", visible: true, type: 'String', order: 1, frozen: true, sortable: true },
-  { field: 'agente', header: "Nome Agente", visible: true, type: 'String', order: 2, frozen: false, sortable: true },
+  {
+    field: "nomeCliente",
+    header: "Nome Cliente",
+    visible: true,
+    type: "String",
+    order: 1,
+    frozen: true,
+    sortable: true,
+  },
+  {
+    field: "agente",
+    header: "Nome Agente",
+    visible: true,
+    type: "String",
+    order: 2,
+    frozen: false,
+    sortable: true,
+  },
 ]
 
 const tableItems = ref([])
@@ -258,15 +303,18 @@ const tableItems = ref([])
 const filterObj = ref({
   idAgente: 0,
   idCliente: props.idAnagrafica,
-  idPreventivo: 0
+  idPreventivo: 0,
 })
 
 function getData() {
+  console.log("Preventivatore/GetPreventivi")
   loading.value = true
   // tableItems.value.splice(0)
-  const service = new AxiosService('Preventivatore/GetPreventivi')
-  service.create(filterObj.value)
-    .then(res => {
+  const service = new AxiosService("Preventivatore/GetPreventivi")
+  service
+    .create(filterObj.value)
+    .then((res) => {
+      console.log("res", res)
       tableItems.value = res
     })
     .finally(() => {
@@ -276,9 +324,7 @@ function getData() {
 
 getData()
 
-let pageTitle = ref('Preventivi')
-
-
+let pageTitle = ref("Preventivi")
 
 //MODAL
 
@@ -289,10 +335,4 @@ function showModal(item) {
   modalVisible.value = true
   tmpItem.value = { ...item }
 }
-
-
-
-
-
-
 </script>

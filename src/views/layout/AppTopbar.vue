@@ -56,47 +56,47 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex";
-import { AUTH_LOGOUT } from "@/store/actions/auth";
-import Avatar from "primevue/avatar";
-import AxiosService from "@/axiosServices/AxiosService";
-import { useStore } from "vuex";
+import { mapGetters } from "vuex"
+import { AUTH_LOGOUT } from "@/store/actions/auth"
+import Avatar from "primevue/avatar"
+import AxiosService from "@/axiosServices/AxiosService"
+import { useStore } from "vuex"
 export default {
   props: {
     showHamburger: Number,
   },
   created() {
-    const store = useStore();
+    const store = useStore()
 
     setTimeout(() => {
-      this.userVoip = store.getters["loggedUser"];
-      console.log("logged user in topbar, ", store.getters["loggedUser"]);
-    }, 1000);
+      this.userVoip = store.getters["loggedUser"]
+      console.log("logged user in topbar, ", store.getters["loggedUser"])
+    }, 1000)
   },
   data() {
     return {
       userVoip: null,
-    };
+    }
   },
   methods: {
     onMenuToggle(event) {
-      this.$emit("menu-toggle", event);
+      this.$emit("menu-toggle", event)
     },
     logout: function () {
-      const service = new AxiosService("Auth/Logout");
+      const service = new AxiosService("Auth/Logout")
       service
         .create()
         .then((res) => console.log(res))
-        .catch((err) => console.log(err));
+        .catch((err) => console.log(err))
       this.$store.dispatch(AUTH_LOGOUT).then(() => {
-        console.log("logout");
-        this.$router.push("login");
-      });
+        console.log("logout")
+        this.$router.push("login")
+      })
     },
   },
   computed: mapGetters(["loggedUser"]),
   components: { Avatar },
-};
+}
 </script>
 
 <style>
