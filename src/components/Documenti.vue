@@ -20,7 +20,6 @@
                     name="demo[]"
                     :customUpload="true"
                     :previewWidth="50"
-                    :maxFileSize="90000000"
                     :auto="true"
                   />
                 </div>
@@ -58,43 +57,43 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
-import { useRoute } from "vue-router";
-import AxiosService from "@/axiosServices/AxiosService";
+import { ref } from "vue"
+import { useRoute } from "vue-router"
+import AxiosService from "@/axiosServices/AxiosService"
 
-const tempUrlFile = ref("");
-const route = useRoute();
+const tempUrlFile = ref("")
+const route = useRoute()
 
 function getDocumentiPratica() {
   const service = new AxiosService(
     "Pratiche/GetDocumentiPratica/" + route.params.idPratica
-  );
+  )
 
   service.read().then((res) => {
-    documentiPratica.value = res;
-    console.log("documenti pratica , , ,   ", documentiPratica.value);
-  });
+    documentiPratica.value = res
+    console.log("documenti pratica , , ,   ", documentiPratica.value)
+  })
 }
 
 function uploadFile(ev) {
-  const service = new AxiosService("files");
+  const service = new AxiosService("files")
 
   for (let i = 0; i < ev.files.length; i++) {
-    const formData = new FormData();
-    formData.append("file", ev.files[i]);
+    const formData = new FormData()
+    formData.append("file", ev.files[i])
     service
       .postCustomEndpoint("Upload?type=" + "DocumentiPratiche", "", formData)
       .then((res) => {
         console.log(
           "🚀 ~ file: Documenti.vue ~ line 60 ~ uploadFile ~ res",
           res
-        );
-        tempUrlFile.value = res;
-      });
+        )
+        tempUrlFile.value = res
+      })
   }
 }
 
-const documentiPratica = ref([]);
+const documentiPratica = ref([])
 
-getDocumentiPratica();
+getDocumentiPratica()
 </script>

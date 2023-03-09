@@ -38,8 +38,9 @@
 .prestitosi-buttons .button-prestitosi {
   background: #0e3996;
   border: 1px solid #0e3996;
-
-  padding: 1rem 6rem;
+  width: 210px;
+  height: 64px;
+  padding: 1rem auto;
 }
 
 .prestitosi-buttons .button-prestitosi:hover {
@@ -47,11 +48,44 @@
   color: #0e3996;
   // font-weight: bold;
   border: 1px solid #0e3996;
-  padding: 1rem 6rem;
 }
 
 .prestitosi-buttons .button-prestitosi:focus {
   box-shadow: 0 0 0 1px #1556e2;
   border: 1px solid #0e3996;
-  padding: 1rem 6rem;
+}
+
+.profilo {
+  &-avatar {
+    width: 125px;
+    height: 125px;
+    position: relative;
+    overflow: hidden;
+    border-radius: 50%;
+    margin: 0 1rem;
+    img {
+      display: inline;
+      height: auto;
+      width: 100%;
+      object-fit: cover;
+    }
+  }
+}
+
+.p-inputnumber-input {
+  width: 100%;
+}
+
+.footer-dashboard_2 {
+  height: 150px;
+  background-color: #0e3996;
+
+  .logo-dashboard {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    img {
+      height: 70px;
+    }
+  }
 }

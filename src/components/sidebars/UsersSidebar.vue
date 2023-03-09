@@ -305,7 +305,6 @@
           name="demo[]"
           :customUpload="true"
           :previewWidth="50"
-          :maxFileSize="1000000"
           chooseLabel="Carica Documento"
           :auto="true"
         />

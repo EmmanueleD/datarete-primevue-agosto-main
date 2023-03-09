@@ -188,19 +188,6 @@
                 v-model="objectToPost.valoreImmobile"
               ></InputNumber>
             </div>
-            <div
-              :class="{ 'not-valid-item': !valid_provvigione }"
-              class="flex flex-column w-full mb-4"
-            >
-              <label>Provvigione</label>
-              <InputNumber
-                currency="EUR"
-                mode="currency"
-                locale="it-IT"
-                :minFractionDigits="2"
-                v-model="objectToPost.provvigione"
-              ></InputNumber>
-            </div>
           </template>
         </Card>
         <div class="flex justify-content-between mt-4">
@@ -425,10 +412,6 @@
         <span>Importo Altre Spese</span>
         <span>{{ formateDivise(tmpItem.Importo_spese_altre) }}</span>
       </div>
-      <div class="flex justify-content-between">
-        <span>Importo Provvigione</span>
-        <span>{{ formateDivise(tmpItem.Importo_provvigione) }}</span>
-      </div>
     </div>
     <Divider></Divider>
     <div>
@@ -534,7 +517,6 @@ function getFiltro(idPreventivo) {
       objectToPost.value.importo.toString().replaceAll(",", ".")
       objectToPost.value.redditoRichiedenti.toString().replaceAll(",", ".")
       objectToPost.value.valoreImmobile.toString().replaceAll(",", ".")
-      objectToPost.value.provvigione.toString().replaceAll(",", ".")
       ricercaRisultati()
     })
 }
@@ -549,7 +531,7 @@ const objectToPost = ref({
   sesso: "",
   tipoRapporto: "",
   durata: 0,
-  durataAnni: 0,
+  durataAnni: 14,
   tipoTasso: "",
   finalita: "",
   provinciaImmobile: "",
@@ -630,10 +612,6 @@ const finalita = [
     text: "Acquisto in asta",
   },
   {
-    value: "Completamento costruzione",
-    text: "Completamento costruzione",
-  },
-  {
     value: "Acquisto+Ristrutturazione",
     text: "Acquisto e ristrutturazione",
   },
@@ -678,12 +656,7 @@ const tipoTasso = [
 ]
 
 // PRESTITO
-const durataOptions = [
-  10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100,
-  105, 110, 115, 120, 125, 130, 135, 140, 145, 160, 165, 170, 175, 180, 185,
-  190, 195, 200, 205, 210, 215, 220, 225, 230, 235, 240, 245, 250, 255, 260,
-  265, 270, 275, 280, 285, 290, 295, 300,
-]
+const durataOptions = [10, 15, 20, 25, 30]
 
 //CALCOLA
 const risultato = ref([])
@@ -702,7 +675,6 @@ function ricercaRisultati() {
     .replaceAll(".", ",")
   objectToPost.value.redditoRichiedenti.toString().replaceAll(".", ",")
   objectToPost.value.valoreImmobile.toString().replaceAll(".", ",")
-  objectToPost.value.provvigione.toString().replaceAll(".", ",")
 
   axios
     .post(
@@ -740,7 +712,6 @@ function ricercaRisultati() {
               field.nome == "Importo_polizza" ||
               field.nome == "Importo_spese_registro" ||
               field.nome == "Importo_spese_altre" ||
-              field.nome == "Importo_provvigione" ||
               field.nome == "TAN" ||
               field.nome == "TEG" ||
               field.nome == "Stato" ||
@@ -786,8 +757,10 @@ function resettaFiltro() {
 }
 function filterByIstituto() {
   finalRisultato.value.splice(0)
-  finalRisultato.value = reducedRisultato.value.filter((x) => {
-    return x.Denominazione_istituto == istitutiSelected.value
+  reducedRisultato.value.forEach((item) => {
+    if (item.Denominazione_istituto == istitutiSelected.value) {
+      finalRisultato.value.push(item)
+    }
   })
 }
 
@@ -843,10 +816,6 @@ function salvaAnagraficaECreaPreventivo(idNuovoCliente) {
       tempItem.value.Importo_spese_altre.indexOf(",") > -1
         ? tempItem.value.Importo_spese_altre.replace(",", ".")
         : tempItem.value.Importo_spese_altre,
-    importoProvvigione:
-      tempItem.value.Importo_provvigione.indexOf(",") > -1
-        ? tempItem.value.Importo_provvigione.replace(",", ".")
-        : tempItem.value.Importo_provvigione,
 
     durataRinnovo: tempItem.value.durataRinnovo,
     importoErogato: tempItem.value.Importo_erogato,
@@ -916,7 +885,6 @@ function creaPratica(item) {
       importoPolizza: item.Importo_polizza,
       importoSpeseRegistro: item.Importo_spese_registro,
       importoSpeseAltre: item.Importo_spese_altre,
-      importoProvvigione: item.Importo_provvigione,
       importoRataRinnovo: item.Importo_rataRinnovo,
       durataRinnovo: item.durataRinnovo,
       importoErogato: item.Importo_erogato,
@@ -981,7 +949,6 @@ const isValidFilter = computed({
       valid_tipoTasso.value &&
       valid_redditoRichiedenti.value &&
       valid_importo.value &&
-      valid_provvigione.value &&
       valid_durataAnni.value &&
       valid_provinciaImmobile.value &&
       valid_valoreImmobile.value
@@ -1041,11 +1008,7 @@ const valid_valoreImmobile = computed({
     return objectToPost.value.valoreImmobile == 0 ? false : true
   },
 })
-const valid_provvigione = computed({
-  get() {
-    return objectToPost.value.provvigione == 0 ? false : true
-  },
-})
+
 const valid_durataAnni = computed({
   get() {
     return objectToPost.value.durataAnni == 0 ? false : true

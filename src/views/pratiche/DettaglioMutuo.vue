@@ -1,6 +1,12 @@
 <template>
   <div class="wrapper">
-    <h1>Pratica: {{ id_pratica }}</h1>
+    <div class="flex justify-content-between align-items-center">
+      <h1>Pratica: {{ id_pratica }}</h1>
+      <Button
+        v-if="pratica.isBozza"
+        label="Inoltra pratica al Backoffice"
+      ></Button>
+    </div>
     <div class="grid">
       <div class="col-3">
         <Card>
@@ -230,19 +236,6 @@
                     </div>
 
                     <div class="flex col flex-column mb-4">
-                      <label>Tipo di Tasso</label>
-                      <InputText
-                        type="text"
-                        v-model="pratica.tipoTasso"
-                      ></InputText>
-                    </div>
-
-                    <div class="flex col flex-column mb-4">
-                      <label>Tasso finito</label>
-                      <InputNumber v-model="pratica.tassoFinito"></InputNumber>
-                    </div>
-
-                    <div class="flex col flex-column mb-4">
                       <label>Intermediazione (%)</label>
                       <InputNumber
                         :min-fraction-digits="0"
@@ -277,6 +270,16 @@
                         type="text"
                         v-model="pratica.durata"
                       ></InputText>
+                    </div>
+
+                    <div class="flex col flex-column mb-4">
+                      <label>Data rogito previsto</label>
+                      <Calendar v-model="pratica.dataRogitoPrevisto"></Calendar>
+                    </div>
+
+                    <div class="flex col flex-column mb-4">
+                      <label>Agg. previsto rogito</label>
+                      <Calendar v-model="pratica.aggPrevistoRogito"></Calendar>
                     </div>
                   </div>
 
@@ -324,31 +327,6 @@
                         class="mr-2"
                       ></Checkbox>
                       <label>Lavoro prmensile</label>
-                    </div>
-                  </div>
-
-                  <div class="col-12 flex flex-wrap justify-content-between">
-                    <div class="flex col-12 col-md-3 flex-column">
-                      <label>Premio totale polizza</label>
-                      <InputNumber
-                        type="number"
-                        v-model="pratica.premioPolizza"
-                      ></InputNumber>
-                    </div>
-                    <div class="flex col-12 col-md-3 flex-column">
-                      <label>Stato Pol. banca</label>
-                      <InputNumber
-                        type="number"
-                        v-model="pratica.statoPolizza"
-                      ></InputNumber>
-                    </div>
-                    <div class="flex col-12 col-md-3 flex-column">
-                      <label>Data POL CT-L</label>
-                      <Calendar v-model="pratica.dataPolizzaCtl"></Calendar>
-                    </div>
-                    <div class="flex col-12 col-md-3 flex-column">
-                      <label>POL Data-Comp</label>
-                      <Calendar v-model="pratica.polizzaDataComp"></Calendar>
                     </div>
                   </div>
 
@@ -847,7 +825,12 @@ function getQuestoinariOptions() {
   })
 }
 
-const utentiOptions = ref()
+const utentiOptions = ref([
+  {
+    text: "Nessun utente",
+    value: 0,
+  },
+])
 const loadingUtentiOptions = ref(false)
 function getUtentiOptions() {
   loadingUtentiOptions.value = true
@@ -855,7 +838,7 @@ function getUtentiOptions() {
   service
     .read()
     .then((res) => {
-      utentiOptions.value = res
+      utentiOptions.value.push(...res)
     })
     .finally(() => {
       loadingUtentiOptions.value = false

@@ -104,6 +104,11 @@
                 class="mr-2 p-button-rounded p-button-info"
               ></Button>
               <Button
+                @click="showDocumentiSidebar(data)"
+                icon="pi pi-fw pi-file"
+                class="mr-2 p-button-rounded p-button-info"
+              ></Button>
+              <Button
                 @click="confirmDelete(data)"
                 icon="pi pi-fw pi-trash"
                 class="p-button-rounded p-button-danger"
@@ -128,50 +133,60 @@
     >
     </UsersSidebar>
   </Sidebar>
+  <Sidebar
+    v-model:visible="sidebarDocumentiVisible"
+    :baseZIndex="10000"
+    position="right"
+    class="p-sidebar-lg"
+    @hide="$emit('event_HideUsersSidebar')"
+  >
+    <sbUserDocumenti :sidebarData="sidebarDocumentiData"></sbUserDocumenti>
+  </Sidebar>
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
-import { useStore } from "vuex";
-import { useConfirm } from "primevue/useconfirm";
-import { useToast } from "primevue/usetoast";
+import { ref, computed } from "vue"
+import { useStore } from "vuex"
+import { useConfirm } from "primevue/useconfirm"
+import { useToast } from "primevue/usetoast"
 
-import AxiosService from "@/axiosServices/AxiosService";
-import TableSkeleton from "@/components/skeletons/TableSkeleton.vue";
-import UsersSidebar from "@/components/sidebars/UsersSidebar.vue";
+import AxiosService from "@/axiosServices/AxiosService"
+import TableSkeleton from "@/components/skeletons/TableSkeleton.vue"
+import UsersSidebar from "@/components/sidebars/UsersSidebar.vue"
+import sbUserDocumenti from "@/components/sidebars/sbUserDocumenti.vue"
 
-import { FilterMatchMode } from "primevue/api";
+import { FilterMatchMode } from "primevue/api"
 
-const store = useStore();
+const store = useStore()
 function setContentLoading_true() {
-  store.dispatch("CONTENTLOADING_TRUE");
+  store.dispatch("CONTENTLOADING_TRUE")
 }
 function setContentLoading_false() {
-  store.dispatch("CONTENTLOADING_FALSE");
+  store.dispatch("CONTENTLOADING_FALSE")
 }
-const contentLoading = computed(() => store.getters.contentLoading);
+const contentLoading = computed(() => store.getters.contentLoading)
 
-const confirm = useConfirm();
-const toast = useToast();
+const confirm = useConfirm()
+const toast = useToast()
 
-const data = ref();
+const data = ref()
 
 // GET DATA FOR THE VIEW
 function getViewData() {
-  const serviceGET = new AxiosService(view.endpointGET);
-  setContentLoading_true();
+  const serviceGET = new AxiosService(view.endpointGET)
+  setContentLoading_true()
   serviceGET
     .read()
     .then((res) => {
       if (res) {
-        data.value ? (data.value.length = 0) : null;
-        data.value = res;
+        data.value ? (data.value.length = 0) : null
+        data.value = res
         toast.add({
           severity: "success",
           summary: "Lista Opzioni Caricata",
           life: 3000,
-        });
-        setContentLoading_false();
+        })
+        setContentLoading_false()
       }
     })
     .catch((err) => {
@@ -180,9 +195,9 @@ function getViewData() {
         summary: "Errore nel caricamento della lista delle Opzioni",
         detail: err,
         life: 3000,
-      });
-      setContentLoading_false();
-    });
+      })
+      setContentLoading_false()
+    })
 }
 
 // SETTING VIEW
@@ -192,25 +207,51 @@ const view = {
   endpointPOST: "Auth/Users",
   endpointPUT: "Auth/Users", // /ID
   endpointDELETE: "Auth/Users", // /ID
-};
+}
+
+const viewDocumenti = {
+  title: "Documenti Utenti",
+  endpointGET: "Auth/UserDocuments/",
+  endpointPOST: "Auth/AddUserDocuments/",
+  endpointPUT: "Auth/UpdateUserDocuments/", // /ID
+  endpointDELETE: "Auth/DeleteUserDocuments/", // /ID
+}
 
 // SETTINGS AND DYNAMICS SIDEBAR
-const sidebarVisible = ref(false);
+const sidebarVisible = ref(false)
 const sidebarData = ref({
   view: view,
   event: {},
-});
+})
 function showSidebar(event) {
-  sidebarData.value.event = event;
-  sidebarVisible.value = true;
+  sidebarData.value.event = event
+  sidebarVisible.value = true
 }
 function event_HideUsersSidebar() {
-  sidebarVisible.value = false;
+  sidebarVisible.value = false
   sidebarData.value = {
     view: view,
     event: {},
-  };
-  getViewData();
+  }
+  getViewData()
+}
+
+const sidebarDocumentiVisible = ref(false)
+const sidebarDocumentiData = ref({
+  view: viewDocumenti,
+  event: {},
+})
+function showDocumentiSidebar(event) {
+  sidebarDocumentiVisible.value = true
+  sidebarDocumentiData.value.event = event
+}
+function event_HideDocumentiSidebar() {
+  sidebarDocumentiVisible.value = false
+  sidebarDocumentiData.value = {
+    view: viewDocumenti,
+    event: {},
+  }
+  getViewData()
 }
 
 // DELETE OPTION
@@ -221,14 +262,14 @@ function confirmDelete(element) {
     icon: "pi pi-fw pi-trash",
     acceptClass: "p-button-danger",
     accept: () => {
-      deleteStato(element);
+      deleteStato(element)
     },
     reject: () => {
-      return;
+      return
     },
-  });
+  })
 }
-const serviceDELETE = new AxiosService(view.endpointDELETE);
+const serviceDELETE = new AxiosService(view.endpointDELETE)
 function deleteStato(element) {
   serviceDELETE
     .delete(element.id)
@@ -239,9 +280,9 @@ function deleteStato(element) {
           summary: "Opzione Eliminata",
           detail: element.nome,
           life: 3000,
-        });
-        data.value ? (data.value.length = 0) : null;
-        getViewData();
+        })
+        data.value ? (data.value.length = 0) : null
+        getViewData()
       }
     })
     .catch((error) => {
@@ -250,25 +291,25 @@ function deleteStato(element) {
         summary: "Errore nell'eliminazione dell'opzione'",
         detail: error,
         life: 3000,
-      });
-      data.value ? (data.value.length = 0) : null;
-      getViewData();
-    });
+      })
+      data.value ? (data.value.length = 0) : null
+      getViewData()
+    })
 }
 
 // DATATABLE AND FILTERS SETTINFG
 const filters1 = ref({
   global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-});
+})
 
 function clearFilter1() {
-  initFilters1();
+  initFilters1()
 }
 function initFilters1() {
   filters1.value = {
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-  };
+  }
 }
 
-getViewData();
+getViewData()
 </script>

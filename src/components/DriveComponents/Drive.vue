@@ -44,7 +44,6 @@
             name="demo[]"
             :customUpload="true"
             :previewWidth="50"
-            :maxFileSize="1000000"
             chooseLabel="Carica Documento"
             :auto="true"
           />
@@ -273,120 +272,120 @@
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
-import DriveFolder from "@/components/DriveComponents/DriveFolder.vue";
-import DriveFile from "@/components/DriveComponents/DriveFile.vue";
-import AxiosService from "@/axiosServices/AxiosService";
+import { ref, computed } from "vue"
+import DriveFolder from "@/components/DriveComponents/DriveFolder.vue"
+import DriveFile from "@/components/DriveComponents/DriveFile.vue"
+import AxiosService from "@/axiosServices/AxiosService"
 
-const loading = ref(false);
+const loading = ref(false)
 
 const props = defineProps({
   idDrive: Number,
-});
+})
 
-const folders = ref([]);
-const steps = ref([]);
+const folders = ref([])
+const steps = ref([])
 
 function getDriveRoot() {
-  loading.value = true;
-  const service = new AxiosService("Drive/GetFolders/" + props.idDrive + "/0");
+  loading.value = true
+  const service = new AxiosService("Drive/GetFolders/" + props.idDrive + "/0")
   service
     .read()
     .then((res) => {
-      steps.value.splice(0);
-      folders.value = res;
+      steps.value.splice(0)
+      folders.value = res
     })
     .finally(() => {
-      loading.value = false;
-      getFiles(0);
-    });
+      loading.value = false
+      getFiles(0)
+    })
 }
 
 function getFiles(idFolder) {
-  loading.value = true;
+  loading.value = true
   const service = new AxiosService(
     "Drive/GetFiles/" + props.idDrive + "/" + idFolder
-  );
+  )
   service
     .read()
     .then((res) => (files.value = res))
-    .finally(() => (loading.value = false));
+    .finally(() => (loading.value = false))
 }
 
 function openFolder(folder) {
-  console.log(folder);
-  loading.value = true;
+  console.log(folder)
+  loading.value = true
   const service = new AxiosService(
     "Drive/GetFolders/" + props.idDrive + "/" + folder.id
-  );
+  )
   service
     .read()
     .then((res) => {
       if (steps.value[0]) {
         if (steps.value[0].id == 0) {
-          steps.value.shift();
+          steps.value.shift()
         }
       }
-      steps.value.push(folder);
-      folders.value = res;
+      steps.value.push(folder)
+      folders.value = res
     })
     .finally(() => {
-      loading.value = false;
-      getFiles(folder.id);
-    });
+      loading.value = false
+      getFiles(folder.id)
+    })
 }
 
 function breadcrumbNavigation(step, index) {
-  const currentStep = { ...step };
-  steps.value.splice(index, steps.value.length);
-  openFolder(currentStep);
+  const currentStep = { ...step }
+  steps.value.splice(index, steps.value.length)
+  openFolder(currentStep)
 }
 
-const sidebarVisible = ref(false);
+const sidebarVisible = ref(false)
 const sidebarData = ref({
   nome: "",
   icona: "pi-folder",
-});
+})
 function showSidebar() {
-  sidebarVisible.value = true;
+  sidebarVisible.value = true
 }
 function hideSidebar(currentStep) {
-  sidebarVisible.value = false;
+  sidebarVisible.value = false
   sidebarData.value = {
     nome: "",
     icona: "pi-folder",
-  };
-  breadcrumbNavigation(currentStep, steps.value.length - 1);
+  }
+  breadcrumbNavigation(currentStep, steps.value.length - 1)
 }
 
 function saveFolder() {
-  loading.value = true;
+  loading.value = true
 
   const currentStep =
     steps.value.length > 0
       ? { ...steps.value[steps.value.length - 1] }
-      : { id: 0 };
+      : { id: 0 }
 
   if (!sidebarData.value.id) {
     const service = new AxiosService(
       "Drive/CreateFolder/" + props.idDrive + "/" + currentStep.id
-    );
+    )
     service
       .create(sidebarData.value)
       .then((res) => console.log(res))
       .finally(() => {
-        loading.value = false;
-        hideSidebar(currentStep);
-      });
+        loading.value = false
+        hideSidebar(currentStep)
+      })
   } else {
-    const service = new AxiosService("Drive/EditFolder/" + props.idDrive);
+    const service = new AxiosService("Drive/EditFolder/" + props.idDrive)
     service
       .update(sidebarData.value)
       .then((res) => console.log(res))
       .finally(() => {
-        loading.value = false;
-        hideSidebar(currentStep);
-      });
+        loading.value = false
+        hideSidebar(currentStep)
+      })
   }
 }
 
@@ -394,24 +393,24 @@ function deleteFolder(folder) {
   console.log(
     "🚀 ~ file: DataDrive.vue ~ line 205 ~ deleteFolder ~ folder",
     folder
-  );
-  loading.value = true;
-  const service = new AxiosService("Drive/DeleteFolder/" + props.idDrive + "/");
+  )
+  loading.value = true
+  const service = new AxiosService("Drive/DeleteFolder/" + props.idDrive + "/")
   service
     .delete(folder.id)
     .then((res) => console.log(res))
     .finally(() => {
-      loading.value = false;
+      loading.value = false
       if (steps.value.length == 0) {
-        breadcrumbNavigation(currentFolder.value, 0);
+        breadcrumbNavigation(currentFolder.value, 0)
       } else {
-        breadcrumbNavigation(currentFolder.value, steps.value.length - 1);
+        breadcrumbNavigation(currentFolder.value, steps.value.length - 1)
       }
-    });
+    })
 }
 
-const folderMenu = ref();
-const fileMenu = ref();
+const folderMenu = ref()
+const fileMenu = ref()
 const folderContextMenu = ref([
   {
     label: "Apri",
@@ -422,8 +421,8 @@ const folderContextMenu = ref([
     label: "Modifica",
     icon: "pi pi-pencil",
     command: () => {
-      sidebarData.value = { ...toActionFolder.value };
-      showSidebar();
+      sidebarData.value = { ...toActionFolder.value }
+      showSidebar()
     },
   },
   {
@@ -431,7 +430,7 @@ const folderContextMenu = ref([
     icon: "pi pi-trash",
     command: () => deleteFolder(toActionFolder.value),
   },
-]);
+])
 
 const filesContextMenu = ref([
   {
@@ -443,7 +442,7 @@ const filesContextMenu = ref([
     label: "Modifica",
     icon: "pi pi-pencil",
     command: () => {
-      showRinominaFile();
+      showRinominaFile()
     },
   },
   {
@@ -451,43 +450,43 @@ const filesContextMenu = ref([
     icon: "pi pi-trash",
     command: () => deleteFile(currentFile.value),
   },
-]);
-const toActionFolder = ref();
+])
+const toActionFolder = ref()
 function showFolderContextMenu(event, folder) {
-  toActionFolder.value = { ...folder };
-  folderMenu.value.show(event);
+  toActionFolder.value = { ...folder }
+  folderMenu.value.show(event)
 }
 
 function showFilesContextMenu(event, file) {
-  currentFile.value = { ...file };
-  fileMenu.value.show(event);
+  currentFile.value = { ...file }
+  fileMenu.value.show(event)
 }
 
-const urlFile = ref();
-const currentFileName = ref();
-const currentFile = ref();
-const files = ref();
+const urlFile = ref()
+const currentFileName = ref()
+const currentFile = ref()
+const files = ref()
 
 function uploadFile(ev) {
-  loading.value = true;
-  urlFile.value = "";
-  const service = new AxiosService("files");
+  loading.value = true
+  urlFile.value = ""
+  const service = new AxiosService("files")
   for (let i = 0; i < ev.files.length; i++) {
-    const formData = new FormData();
-    formData.append("file", ev.files[i]);
+    const formData = new FormData()
+    formData.append("file", ev.files[i])
     service
       .postCustomEndpoint("Upload?type=" + "DataDriveFiles", "", formData)
       .then((res) => {
         console.log(
           "🚀 ~ file: NuovaCircolare.vue ~ line 78 ~ uploadFile ~ res",
           res
-        );
-        urlFile.value = res;
+        )
+        urlFile.value = res
       })
       .finally(() => {
         const service = new AxiosService(
           "Drive/AddFile/" + props.idDrive + "/" + currentFolderId.value
-        );
+        )
         service
           .create({
             nome: urlFile.value.substring(
@@ -498,92 +497,92 @@ function uploadFile(ev) {
           })
           .then((res) => console.log(res))
           .finally(() => {
-            breadcrumbNavigation(currentFolder.value, steps.value.length - 1);
-            loading.value = false;
-          });
-      });
+            breadcrumbNavigation(currentFolder.value, steps.value.length - 1)
+            loading.value = false
+          })
+      })
   }
 }
 
 function deleteFile(file) {
-  console.log("🚀 ~ file: DataDrive.vue ~ line 205 ~ deleteFile ~ File", file);
-  loading.value = true;
-  const service = new AxiosService("Drive/DeleteFile/" + props.idDrive + "/0");
+  console.log("🚀 ~ file: DataDrive.vue ~ line 205 ~ deleteFile ~ File", file)
+  loading.value = true
+  const service = new AxiosService("Drive/DeleteFile/" + props.idDrive + "/0")
   service
     .delete(file.id)
     .then((res) => console.log(res))
     .finally(() => {
-      loading.value = false;
+      loading.value = false
       if (steps.value.length == 0) {
-        breadcrumbNavigation({ id: 0 }, 0);
+        breadcrumbNavigation({ id: 0 }, 0)
       } else {
         breadcrumbNavigation(
           steps.value[steps.value.length - 1],
           steps.value.length - 1
-        );
+        )
       }
-    });
+    })
 }
 
-const rinominaVisible = ref(false);
+const rinominaVisible = ref(false)
 function showRinominaFile() {
-  rinominaVisible.value = true;
+  rinominaVisible.value = true
 }
 function rinominaHide() {
-  rinominaVisible.value = false;
+  rinominaVisible.value = false
 }
 
 function rinominaFile() {
-  loading.value = true;
-  console.log("current file : ", currentFile.value);
+  loading.value = true
+  console.log("current file : ", currentFile.value)
   const service = new AxiosService(
     "Drive/EditFile/" + props.idDrive + "/" + currentFolderId.value
-  );
+  )
   // currentFile.value.nome = fileName(currentFile.value.nome)
   service
     .update(currentFile.value)
     .then((res) => console.log(res))
     .finally(() => {
-      rinominaVisible.value = false;
+      rinominaVisible.value = false
       if (steps.value.length == 0) {
-        breadcrumbNavigation(currentFolder.value, 0);
+        breadcrumbNavigation(currentFolder.value, 0)
       } else {
-        breadcrumbNavigation(currentFolder.value, steps.value.length - 1);
+        breadcrumbNavigation(currentFolder.value, steps.value.length - 1)
       }
-      loading.value = false;
-    });
+      loading.value = false
+    })
 }
 
 function fileName(file) {
-  const fileArr = file.replaceAll(" ", "-").split("_");
-  currentFileName.value = fileArr[1];
-  return fileArr[1];
+  const fileArr = file.replaceAll(" ", "-").split("_")
+  currentFileName.value = fileArr[1]
+  return fileArr[1]
 }
 
-const showDialogDocumento = ref(false);
+const showDialogDocumento = ref(false)
 function showFile(file) {
-  currentFile.value = { ...file };
+  currentFile.value = { ...file }
   currentFile.value.url =
-    "https://prestitosi-core.datarete.cloud/" + file.file_url;
-  showDialogDocumento.value = true;
+    "https://prestitosi-core.datarete.cloud/" + file.file_url
+  showDialogDocumento.value = true
 }
 
 const currentFolderId = computed(() => {
   if (steps.value.length > 0) {
-    return steps.value[steps.value.length - 1].id;
+    return steps.value[steps.value.length - 1].id
   }
-  return 0;
-});
+  return 0
+})
 
 const currentFolder = computed(() => {
   if (steps.value.length > 0) {
-    return steps.value[steps.value.length - 1];
+    return steps.value[steps.value.length - 1]
   }
   return {
     id: 0,
-  };
-});
-getDriveRoot();
+  }
+})
+getDriveRoot()
 </script>
 
 <style>

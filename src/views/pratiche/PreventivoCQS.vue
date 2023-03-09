@@ -169,7 +169,6 @@
                 <label>Durata rinnovo</label>
                 <Dropdown
                   :filter="true"
-                  type="text"
                   v-model="objectToPost.durataRinnovo"
                   :options="durataOptions"
                 ></Dropdown>
@@ -576,10 +575,7 @@ const tipoRapportoOptions = [
     text: "Pubblico",
   },
   {
-    text: "Privato SPA",
-  },
-  {
-    text: "Privato SRL",
+    text: "Privato",
   },
   {
     text: "Medico",
@@ -598,12 +594,6 @@ const tipoRapportoOptions = [
   },
   {
     text: "Parapubblico",
-  },
-  {
-    text: "Libero professionista",
-  },
-  {
-    text: "Autonomo",
   },
 ]
 
@@ -655,6 +645,10 @@ function ricercaRisultati() {
   objectToPost.value.importoRichiesto.toString().replaceAll(".", ",")
   objectToPost.value.provvigione.toString().replaceAll(".", ",")
   objectToPost.value.importoRataRinnovo.toString().replaceAll(".", ",")
+
+  if (objectToPost.value.tipoRapporto == "Privato") {
+    objectToPost.value.tipoRapporto = objectToPost.value.tipoRapporto + " SPA"
+  }
 
   axios
     .post(
@@ -806,6 +800,9 @@ function creaPratica(item, idNuovoCliente) {
       idAgente: store.getters.loggedUser.id,
       idCliente: idNuovoCliente || route.params.idAnagrafica,
       percentualeMediazione: objectToPost.value.percentualeMediazione,
+      importoRataRinnovo: objectToPost.value.importoRataRinnovo,
+      durataRinnovo: objectToPost.value.durataRinnovo,
+      dataDecorrenza: objectToPost.value.dataDecorrenza,
     }
 
     const service = new AxiosService("Pratiche/NuovaPratica/cqs")

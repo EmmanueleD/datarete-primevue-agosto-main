@@ -69,7 +69,6 @@
       url="https://prestitosi-core.datarete.cloud/api/Upload?type=DocumentiPratiche"
       @upload="uploadFile($event)"
       :multiple="false"
-      :maxFileSize="90000000"
     >
       <template #empty>
         <p>Trascina qui il nuovo documento che vuoi caricare</p>
@@ -95,73 +94,69 @@
   </Dialog>
 </template>
 
-
-
-
-
 <script setup>
-import { ref } from "vue";
-import { useRoute } from "vue-router";
-import { useStore } from "vuex";
-import AxiosService from "@/axiosServices/AxiosService";
+import { ref } from "vue"
+import { useRoute } from "vue-router"
+import { useStore } from "vuex"
+import AxiosService from "@/axiosServices/AxiosService"
 
 const props = defineProps({
   id_tipo_prodotto: Number,
-});
+})
 
-const loading = ref(false);
-const route = useRoute();
-const store = useStore();
-const data = ref([]);
+const loading = ref(false)
+const route = useRoute()
+const store = useStore()
+const data = ref([])
 
 function showConfirmDelete(data) {
-  console.log(data);
+  console.log(data)
 }
 
-const documentiCaricatiDialogVisible = ref(false);
-const documentiCaricatiDialogData = ref();
+const documentiCaricatiDialogVisible = ref(false)
+const documentiCaricatiDialogData = ref()
 function showDocumentiCaricati(document) {
-  documentiCaricatiDialogVisible.value = true;
-  documentiCaricatiDialogData.value = document;
+  documentiCaricatiDialogVisible.value = true
+  documentiCaricatiDialogData.value = document
 }
 
-const uploadDialogVisible = ref(false);
-const uploadDialogData = ref();
+const uploadDialogVisible = ref(false)
+const uploadDialogData = ref()
 function showUploadDialog(data) {
-  uploadDialogVisible.value = true;
-  uploadDialogData.value = data;
+  uploadDialogVisible.value = true
+  uploadDialogData.value = data
 }
 
-const urlFile = ref("");
+const urlFile = ref("")
 
 function uploadFile(ev) {
-  loading.value = true;
-  urlFile.value = "";
-  const service = new AxiosService("files");
+  loading.value = true
+  urlFile.value = ""
+  const service = new AxiosService("files")
   for (let i = 0; i < ev.files.length; i++) {
-    const formData = new FormData();
-    formData.append("file", ev.files[i]);
+    const formData = new FormData()
+    formData.append("file", ev.files[i])
     service
       .postCustomEndpoint("Upload?type=" + "DocumentiPratiche", "", formData)
       .then((res) => {
-        console.log("upload documenti pratiche ", res);
-        urlFile.value = res;
+        console.log("upload documenti pratiche ", res)
+        urlFile.value = res
       })
       .finally(() => {
-        uploadDialogVisible.value = false;
-        loading.value = false;
+        uploadDialogVisible.value = false
+        loading.value = false
 
-        caricaDocumentoPratica();
-      });
+        caricaDocumentoPratica()
+      })
   }
 }
 
 function caricaDocumentoPratica() {
-  loading.value = true;
+  loading.value = true
 
   const service = new AxiosService(
     "Pratiche/NuovoDocumentoPratica/" + route.params.idPratica
-  );
+  )
 
   service
     .create({
@@ -175,29 +170,29 @@ function caricaDocumentoPratica() {
       console.log(
         "🚀 ~ file: DocumentiPratica.vue:147 ~ caricaDocumentoPratica ~ res",
         res
-      );
+      )
     })
     .finally(() => {
-      getData(props.id_tipo_prodotto);
-    });
+      getData(props.id_tipo_prodotto)
+    })
 }
 
 function getData() {
   const service = new AxiosService(
     "Pratiche/GetDocumentiPratica/" + route.params.idPratica
-  );
+  )
 
-  loading.value = true;
+  loading.value = true
 
   service
     .read()
     .then((res) => {
-      data.value = res;
+      data.value = res
     })
     .finally(() => {
-      loading.value = false;
-    });
+      loading.value = false
+    })
 }
 
-getData();
+getData()
 </script>

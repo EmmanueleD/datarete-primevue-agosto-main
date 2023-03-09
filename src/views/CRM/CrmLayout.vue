@@ -111,6 +111,7 @@ import CRMQuestionariEScript from "./CRMQuestionariEScript.vue"
 import AxiosService from "@/axiosServices/AxiosService"
 import { useRoute } from "vue-router"
 import store from "@/store"
+import axios from "axios"
 
 // eslint-disable-next-line no-undef, no-unused-vars
 const props = defineProps({
@@ -207,7 +208,33 @@ function salvaStato() {
       "Anagrafiche/UpdateStatus/" + route.params.idAnagrafica,
       stato
     )
-    .then((res) => console.log(res))
+    .then((res) => {
+      console.log("cambio stato effettuato -> ", res, statusSelected.value)
+      if (statusSelected.value.id == 14) {
+        console.log(" stato non risponde", statusSelected.value)
+
+        let currentPhone = ""
+
+        currentCrm.value.contatti.forEach((element) => {
+          if (element.idTipoContatto == 3 || element.idTipoContatto == 2) {
+            currentPhone = element.valore
+            return
+          }
+        })
+
+        axios
+          .post("https://hooks.zapier.com/hooks/catch/12276670/3b26lmp/", {
+            telefono: currentPhone ? currentPhone : "senza telefono",
+            nome: currentCrm.value.nome ? currentCrm.value.nome : "senza nome",
+            cognome: currentCrm.value.cognome
+              ? currentCrm.value.cognome
+              : "senza cognome",
+          })
+          .then((res) => {
+            console.log("END POINT ESTERNO NON RISPONDE", res)
+          })
+      }
+    })
     .finally(() => {
       loading.value = false
       setStatoVisible.value = false

@@ -171,31 +171,6 @@
             </div>
           </div>
 
-          <div class="col-12 flex flex-wrap justify-content-between">
-            <div class="flex col-12 col-md-3 flex-column">
-              <label>Premio totale polizza</label>
-              <InputNumber
-                type="number"
-                v-model="pratica.premioPolizza"
-              ></InputNumber>
-            </div>
-            <div class="flex col-12 col-md-3 flex-column">
-              <label>Stato Pol. banca</label>
-              <InputNumber
-                type="number"
-                v-model="pratica.statoPolizza"
-              ></InputNumber>
-            </div>
-            <div class="flex col-12 col-md-3 flex-column">
-              <label>Data POL CT-L</label>
-              <Calendar v-model="pratica.dataPolizzaCtl"></Calendar>
-            </div>
-            <div class="flex col-12 col-md-3 flex-column">
-              <label>POL Data-Comp</label>
-              <Calendar v-model="pratica.polizzaDataComp"></Calendar>
-            </div>
-          </div>
-
           <Divider class="my-4"></Divider>
           <div class="col-12">
             <h4>Immobile in oggetto</h4>
@@ -286,6 +261,12 @@
 
           <div class="flex justify-content-end mb-4 w-full">
             <Button
+              label="Formulario incompleto"
+              disabled
+              v-if="!formAbilitato"
+            ></Button>
+            <Button
+              v-else
               @click="salvaPratica"
               :loading="loading"
               label="Salva"
@@ -299,10 +280,16 @@
 
 <script setup>
 import AxiosService from "@/axiosServices/AxiosService"
-import { ref } from "vue"
+import { ref, computed } from "vue"
 import { useToast } from "primevue/usetoast"
+import { useStore } from "vuex"
 const toast = useToast()
 const pratica = ref({})
+const store = useStore()
+
+pratica.value.idAgente = store.getters["loggedUser"].id
+
+pratica.value.descrizioneProdotto = "Mutuo"
 const loading = ref(false)
 function salvaPratica() {
   loading.value = true
@@ -324,7 +311,7 @@ function salvaPratica() {
     })
 }
 
-const utentiOptions = ref()
+const utentiOptions = ref([{ text: "Nessun utente", value: 0 }])
 const loadingUtentiOptions = ref(false)
 function getUtentiOptions() {
   loadingUtentiOptions.value = true
@@ -332,12 +319,40 @@ function getUtentiOptions() {
   service
     .read()
     .then((res) => {
-      utentiOptions.value = res
+      utentiOptions.value.push(...res)
     })
     .finally(() => {
       loadingUtentiOptions.value = false
     })
 }
+
+const formAbilitato = computed(() => {
+  if (
+    pratica.value.idAgente &&
+    pratica.value.descrizioneProdotto &&
+    pratica.value.istitutoFinanziatore &&
+    pratica.value.motivoFinanzimento &&
+    pratica.value.importo &&
+    pratica.value.importoErogato &&
+    pratica.value.tipoTasso &&
+    pratica.value.tassoFinito &&
+    pratica.value.percentualeMediazione &&
+    pratica.value.importoRata &&
+    pratica.value.durata &&
+    pratica.value.tipoImmobile &&
+    pratica.value.valoreImmobile &&
+    pratica.value.destinazioneUso &&
+    pratica.value.provenienzaImmobile &&
+    pratica.value.comuneImmobile &&
+    pratica.value.capImmobile &&
+    pratica.value.indirizzoImmobile &&
+    pratica.value.civicoImmobile
+  ) {
+    return true
+  } else {
+    return false
+  }
+})
 
 getUtentiOptions()
 </script>

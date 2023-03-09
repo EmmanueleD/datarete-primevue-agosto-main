@@ -1,6 +1,12 @@
 <template>
   <div class="wrapper">
-    <h1>Pratica: {{ id_pratica }}</h1>
+    <div class="flex justify-content-between align-items-center">
+      <h1>Pratica: {{ id_pratica }}</h1>
+      <Button
+        v-if="pratica.isBozza"
+        label="Inoltra pratica al Backoffice"
+      ></Button>
+    </div>
     <div class="grid">
       <div class="col-3">
         <Card>

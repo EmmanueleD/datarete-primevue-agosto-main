@@ -2,6 +2,7 @@
   <div class="w-full grid-center" style="height: 20vh" v-if="loading">
     <i class="pi pi-spin pi-spinner text-xl"></i>
   </div>
+
   <DettaglioCQS v-else-if="tipoPratica == 'Cessione'"></DettaglioCQS>
   <DettaglioDelega v-else-if="tipoPratica == 'Delega'"></DettaglioDelega>
   <DettaglioPrestito

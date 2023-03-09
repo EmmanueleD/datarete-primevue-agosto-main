@@ -130,10 +130,7 @@
                     v-if="eliminazione"
                     @click="confirmDelete(data)"
                     icon="pi pi-fw pi-trash"
-                    class="
-                      p-button-rounded p-button-outlined p-button-danger
-                      ml-4
-                    "
+                    class="p-button-rounded p-button-outlined p-button-danger ml-4"
                   ></Button>
                 </template>
               </Column>
@@ -152,7 +149,7 @@
     :modal="true"
   >
     <iframe
-      :src="currentCircolare"
+      :src="currentCircolare.url"
       frameBorder="0"
       scrolling="auto"
       width="100%"
@@ -190,108 +187,108 @@
   </Sidebar>
 </template>
 
-<script setup >
-import { ref, computed } from "vue";
+<script setup>
+import { ref, computed } from "vue"
 // import { FilterMatchMode, FilterOperator } from "primevue/api";
-import { useStore } from "vuex";
-import TableSkeleton from "../../components/skeletons/TableSkeleton.vue";
-import CircolariViste from "@/components/sidebars/CircolariViste.vue";
-import AxiosService from "@/axiosServices/AxiosService";
-import NuovaCircolare from "@/components/sidebars/NuovaCircolare.vue";
-import { AUTH_LOGOUT } from "@/store/actions/auth";
-import { useConfirm } from "primevue/useconfirm";
-import { useToast } from "primevue/usetoast";
-const toast = useToast();
-const confirm = useConfirm();
+import { useStore } from "vuex"
+import TableSkeleton from "../../components/skeletons/TableSkeleton.vue"
+import CircolariViste from "@/components/sidebars/CircolariViste.vue"
+import AxiosService from "@/axiosServices/AxiosService"
+import NuovaCircolare from "@/components/sidebars/NuovaCircolare.vue"
+import { AUTH_LOGOUT } from "@/store/actions/auth"
+import { useConfirm } from "primevue/useconfirm"
+import { useToast } from "primevue/usetoast"
+const toast = useToast()
+const confirm = useConfirm()
 
-const store = useStore();
+const store = useStore()
 
-const visualizzazione = ref(false);
-const modifica = ref(false);
-const inserimento = ref(false);
-const eliminazione = ref(false);
+const visualizzazione = ref(false)
+const modifica = ref(false)
+const inserimento = ref(false)
+const eliminazione = ref(false)
 
-const contentLoading = computed(() => store.getters.contentLoading);
+const contentLoading = computed(() => store.getters.contentLoading)
 
 const serviceAuthPage = new AxiosService(
   "Authorizations/GetUserAuthorizationForComponent/2"
-);
+)
 serviceAuthPage.read().then((res) => {
   if (res.validSession) {
-    visualizzazione.value = res.visualizzazione;
-    modifica.value = res.modifica;
-    inserimento.value = res.inserimento;
-    eliminazione.value = res.eliminazione;
+    visualizzazione.value = res.visualizzazione
+    modifica.value = res.modifica
+    inserimento.value = res.inserimento
+    eliminazione.value = res.eliminazione
   } else {
-    logout();
+    logout()
   }
-});
+})
 
 function logout() {
-  const service = new AxiosService("Auth/Logout");
+  const service = new AxiosService("Auth/Logout")
   service
     .create()
     .then((res) => console.log(res))
-    .catch((err) => console.log(err));
+    .catch((err) => console.log(err))
   this.$store.dispatch(AUTH_LOGOUT).then(() => {
-    console.log("logout");
-    this.$router.push("login");
-  });
+    console.log("logout")
+    this.$router.push("login")
+  })
 }
 
 // GET LIST CIRCOLARI
-const serviceGET = new AxiosService("Circolari/GetCircolari");
+const serviceGET = new AxiosService("Circolari/GetCircolari")
 function getViewData() {
-  data.value.splice(0);
+  data.value.splice(0)
   serviceGET
     .read()
     .then((res) => {
-      data.value = res;
+      data.value = res
     })
-    .catch((err) => console.log(err));
+    .catch((err) => console.log(err))
 }
 
 // SIDEBAR NUOVA CIRCOLARE
-const nuovaCircolareData = ref({});
-const nuovaCircolareVisible = ref(false);
+const nuovaCircolareData = ref({})
+const nuovaCircolareVisible = ref(false)
 function showNuovaCircolare(event) {
-  event ? (nuovaCircolareData.value = event) : null;
-  nuovaCircolareVisible.value = true;
+  event ? (nuovaCircolareData.value = event) : null
+  nuovaCircolareVisible.value = true
 }
 
 function event_HideNuovaCircolare() {
-  nuovaCircolareVisible.value = false;
-  nuovaCircolareData.value = {};
-  getViewData();
+  nuovaCircolareVisible.value = false
+  nuovaCircolareData.value = {}
+  getViewData()
 }
 
 //SIDEBAR VISTE CIRCOLARE
-const circolariVisible = ref(false);
-const circolariData = ref({});
+const circolariVisible = ref(false)
+const circolariData = ref({})
 function showCircolari(event) {
   console.log(
     "🚀 ~ file: Circolari.vue ~ line 195 ~ showCircolari ~ event",
     event
-  );
-  circolariVisible.value = true;
-  circolariData.value = event;
+  )
+  circolariVisible.value = true
+  circolariData.value = event
 }
 
-const dt = ref();
+const dt = ref()
 const exportCSV = () => {
-  dt.value.exportCSV();
-};
+  dt.value.exportCSV()
+}
 
-const data = ref([]);
+const data = ref([])
 
-const currentCircolare = ref();
-const showDialogDocumento = ref(false);
+const currentCircolare = ref()
+const showDialogDocumento = ref(false)
 function showDocumento(circolare) {
-  currentCircolare.value = { ...circolare };
-  currentCircolare.value.url = "";
+  currentCircolare.value = { ...circolare }
+  currentCircolare.value.url = ""
   currentCircolare.value.url =
-    "https://prestitosi-core.datarete.cloud/" + circolare.urlFile;
-  showDialogDocumento.value = true;
+    "https://prestitosi-core.datarete.cloud/" + circolare.urlFile
+  showDialogDocumento.value = true
 }
 
 function formatDate(value) {
@@ -300,9 +297,9 @@ function formatDate(value) {
       day: "2-digit",
       month: "2-digit",
       year: "numeric",
-    });
+    })
   }
-  return "";
+  return ""
 }
 
 function formatTime(value) {
@@ -310,7 +307,7 @@ function formatTime(value) {
     return new Date(value).toLocaleTimeString("it-IT", {
       hour: "2-digit",
       minute: "2-digit",
-    });
+    })
   }
 }
 
@@ -321,15 +318,15 @@ function confirmDelete(element) {
     icon: "pi pi-fw pi-trash",
     acceptClass: "p-button-danger",
     accept: () => {
-      deleteItem(element);
+      deleteItem(element)
     },
     reject: () => {
-      return;
+      return
     },
-  });
+  })
 }
 
-const serviceDELETE = new AxiosService("Circolari/DeleteCircolare");
+const serviceDELETE = new AxiosService("Circolari/DeleteCircolare")
 function deleteItem(element) {
   serviceDELETE
     .delete(element.id)
@@ -340,8 +337,8 @@ function deleteItem(element) {
           summary: "Opzione Eliminata",
           detail: element.nome,
           life: 3000,
-        });
-        getViewData();
+        })
+        getViewData()
       }
     })
     .catch((error) => {
@@ -350,22 +347,22 @@ function deleteItem(element) {
         summary: "Errore nell'eliminazione dell'opzione'",
         detail: error,
         life: 3000,
-      });
-      getViewData();
-    });
+      })
+      getViewData()
+    })
 }
 
 const conferma = ref({
   value: false,
   icon: "pi-eye",
-});
+})
 
 function confermaLettura() {
-  conferma.value.value = true;
-  conferma.value.icon = "pi-check";
-  const service = new AxiosService("Circolari/LettaCircolare");
-  service.update(currentCircolare.value);
+  conferma.value.value = true
+  conferma.value.icon = "pi-check"
+  const service = new AxiosService("Circolari/LettaCircolare")
+  service.update(currentCircolare.value)
 }
 
-getViewData();
+getViewData()
 </script>

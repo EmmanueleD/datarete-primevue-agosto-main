@@ -379,7 +379,6 @@
                   name="demo[]"
                   :customUpload="true"
                   :previewWidth="50"
-                  :maxFileSize="1000000"
                   chooseLabel="Carica Documento"
                   :auto="false"
                 />
@@ -425,15 +424,21 @@
         <div class="flex justify-content-end mt-4">
           <Button
             @click="mode = 'edit'"
-            v-if="mode == 'view'"
+            v-if="mode == 'view' && formAbilitato"
             label="Modifica"
           ></Button>
           <Button
-            v-else
+            v-else-if="formAbilitato"
             :loading="loading"
             label="Salva"
             @click="saveForm"
           ></Button>
+          <Button v-else disabled label="Formulario incompleto"></Button>
+        </div>
+        <div v-if="!formAbilitato" class="w-full flex justify-content-end mb-6">
+          <span class="text-red-500"
+            >Per procedere devi completare tutti i campi del formulario</span
+          >
         </div>
       </template>
     </Card>
@@ -441,7 +446,7 @@
 </template>
 
 <script setup>
-import { ref } from "vue"
+import { ref, computed } from "vue"
 import AxiosService from "../../axiosServices/AxiosService"
 import { useToast } from "primevue/usetoast"
 import { useRoute } from "vue-router"
@@ -635,6 +640,27 @@ function addRowIndirizzi() {
   })
 }
 const loading = ref(false)
+
+const formAbilitato = computed(() => {
+  if (
+    anagraficaClienti.value.nome.length > 0 &&
+    anagraficaClienti.value.cognome.length > 0 &&
+    anagraficaClienti.value.codiceFiscale.length > 0 &&
+    anagraficaClienti.value.email.length > 0 &&
+    anagraficaClienti.value.idSesso != 0 &&
+    anagraficaClienti.value.dataNascita &&
+    anagraficaClienti.value.NazioneNascita.length > 0 &&
+    anagraficaClienti.value.CittaNascita.length > 0 &&
+    anagraficaClienti.value.idTipoOccupazione != 0 &&
+    anagraficaClienti.value.professione.length > 0 &&
+    anagraficaClienti.value.dataAssunzione
+  ) {
+    return true
+  } else {
+    return false
+  }
+})
+
 function saveForm() {
   loading.value = true
   const serviceGET = new AxiosService(

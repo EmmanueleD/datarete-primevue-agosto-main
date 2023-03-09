@@ -3,10 +3,10 @@
     <div
       class="sidebar-header d-flex justify-content-between align-items-center"
     >
-      <div class="logo-image">
+      <div @click="$router.push('/')" class="logo-image cursor-pointer">
         <img
           style="width: 172px; margin-top: 15px"
-          src="https://prestitosifinance.it/wp-content/uploads/2022/09/PRESTITOSI.png"
+          src="../../assets/images/logo-crm.png"
         />
       </div>
       <i @click="$emit('menu-toggle')" class="double-arrow left"></i>
@@ -25,8 +25,8 @@
 </template>
 
 <script>
-import AppSubmenu from "./AppSubmenu";
-import { mapGetters } from "vuex";
+import AppSubmenu from "./AppSubmenu"
+import { mapGetters } from "vuex"
 export default {
   props: {
     model: Array,
@@ -34,17 +34,17 @@ export default {
 
   methods: {
     onMenuItemClick() {
-      this.$emit("menuitem-click");
+      this.$emit("menuitem-click")
     },
     onMenuToggle(event) {
-      this.$emit("menu-toggle", event);
+      this.$emit("menu-toggle", event)
     },
   },
   components: {
     AppSubmenu: AppSubmenu,
   },
   computed: mapGetters(["company"]),
-};
+}
 </script>
 
 <style lang="scss">

@@ -1,6 +1,7 @@
 <template>
-  <Dashboard_2 v-if="isGest"></Dashboard_2>
-  <Dashboard_1 v-else></Dashboard_1>
+  <!-- <Dashboard_2 v-if="isGest"></Dashboard_2> -->
+  <!-- <Dashboard_1 v-else></Dashboard_1> -->
+  <Dashboard_2></Dashboard_2>
 </template>
 
 <script setup>

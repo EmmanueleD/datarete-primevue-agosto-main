@@ -21,19 +21,23 @@
         >
           <Button
             @click="$router.push('pratiche/preventivo-prestito/0/0')"
-            label="Prestito" class="p-button-lg button-prestitosi"
+            label="Prestito personale"
+            class="p-button-lg button-prestitosi"
           ></Button>
           <Button
             @click="$router.push('pratiche/preventivo-mutuo/0/0')"
-            label="Mutuo" class="p-button-lg button-prestitosi"
+            label="Mutuo"
+            class="p-button-lg button-prestitosi"
           ></Button>
           <Button
             @click="$router.push('pratiche/preventivo-cqs/0/0')"
-            label="Cessione" class="p-button-lg button-prestitosi"
+            label="Cessione del quinto"
+            class="p-button-lg button-prestitosi"
           ></Button>
           <Button
             @click="$router.push('pratiche/preventivo-delega/0/0')"
-            label="Delega" class="p-button-lg button-prestitosi"
+            label="Delega"
+            class="p-button-lg button-prestitosi"
           ></Button>
         </div>
       </template>
@@ -43,37 +47,109 @@
       <div class="col-12 col-md-8">
         <Card class="mb-4">
           <template #content>
+            <h4>Circolari</h4>
+            <div
+              v-if="loading.circolari"
+              class="w-full flex justify-content-center"
+            >
+              <i class="pi pi-spin pi-spinner text-xl"></i>
+            </div>
             <Carousel
+              v-else
+              :value="circolari"
+              :numVisible="2"
+              :numScroll="1"
+              :responsiveOptions="responsiveOptions"
+            >
+              <template #item="slotProps">
+                <div
+                  v-if="loading.circolari"
+                  class="w-full flex justify-content-center"
+                >
+                  <i class="pi pi-spin pi-spinner"></i>
+                </div>
+                <div
+                  v-else
+                  class="text-center border-round-lg py-4 px-2 shadow-1 border-1 border-200 mx-4"
+                >
+                  <!-- {{ truncate(slotProps.data.testo, 99) }} -->
+                  <!-- {{ slotProps.data }} -->
+                  <h4>{{ slotProps.data.titolo }}</h4>
+                  <div
+                    class="w-full flex justify-content-between align-items-center px-4"
+                  >
+                    <span class="text-gray-400 font-bold">{{
+                      new Date(
+                        slotProps.data.dataPubblicazione
+                      ).toLocaleDateString("it", {
+                        year: "numeric",
+                        month: "short",
+                        day: "2-digit",
+                      })
+                    }}</span>
+                    <Button
+                      @click="apriCircolare(slotProps.data)"
+                      label="Leggi..."
+                      class="p-button-text p-0"
+                    ></Button>
+                  </div>
+                </div>
+              </template>
+            </Carousel>
+          </template>
+        </Card>
+
+        <Card class="mb-4">
+          <template #content>
+            <h4>Notizie</h4>
+
+            <div
+              v-if="loading.circolari"
+              class="w-full flex justify-content-center"
+            >
+              <i class="pi pi-spin pi-spinner text-xl"></i>
+            </div>
+            <Carousel
+              v-else
               :value="notizie"
               :numVisible="2"
               :numScroll="1"
               :responsiveOptions="responsiveOptions"
-              :circular="true"
-              :autoplayInterval="2887"
             >
-              <template #header>
-                <h5>Notizie</h5>
-              </template>
               <template #item="slotProps">
                 <div class="py-2">
                   <div
-                    class="
-                      text-center
-                      border-round-lg
-                      py-4
-                      px-2
-                      shadow-1
-                      border-1 border-200
-                      mx-4
-                    "
+                    class="text-center border-round-lg py-4 px-2 shadow-1 border-1 border-200 mx-4"
                   >
-               
                     <div>
-                      <h4 class="mb-4">{{ slotProps.data.titolo }}</h4>
-                      <h6 class="mt-0 mb-3">{{ truncate(slotProps.data.testo, 222) }}</h6>
-                      <span class="text-gray-400 font-bold">{{ new Date(slotProps.data.data).toLocaleDateString('it', {
-                        year: 'numeric', month: 'short', day:'2-digit'
-                      }) }}</span>
+                      <div class="w-full flex justify-content-center px-4">
+                        <img
+                          v-if="slotProps.data.imgUrl"
+                          class="w-full border-round-sm"
+                          :src="slotProps.data.imgUrl"
+                        />
+                      </div>
+                      <h4 class="mb-4 px-4">{{ slotProps.data.titolo }}</h4>
+
+                      <div
+                        class="w-full flex justify-content-between align-items-center px-4"
+                      >
+                        <span class="text-gray-400 font-bold">{{
+                          new Date(slotProps.data.data).toLocaleDateString(
+                            "it",
+                            {
+                              year: "numeric",
+                              month: "short",
+                              day: "2-digit",
+                            }
+                          )
+                        }}</span>
+                        <Button
+                          @click="apriNotizia(slotProps.data)"
+                          label="Leggi..."
+                          class="p-button-text p-0"
+                        ></Button>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -86,21 +162,30 @@
           <div class="col-12 col-md-6">
             <Card class="mb-4">
               <template #content>
-                <div class="cursor-pointer" @click="$router.push('gestione/formazione-online/')">
-                  <img class="w-100" src="../assets/images/prestitosi-formazione.png" >
+                <div
+                  class="cursor-pointer"
+                  @click="$router.push('gestione/formazione-online/')"
+                >
+                  <img
+                    class="w-100"
+                    src="../assets/images/prestitosi-formazione.png"
+                  />
                 </div>
-               
               </template>
             </Card>
           </div>
           <div class="col-12 col-md-6">
             <Card class="mb-4">
               <template #content>
-
-                <div class="cursor-pointer" @click="$router.push('agenda/calendario')">
-                  <img class="w-100" src="../assets/images/prestitosi-calendario.png" >
+                <div
+                  class="cursor-pointer"
+                  @click="$router.push('agenda/calendario')"
+                >
+                  <img
+                    class="w-100"
+                    src="../assets/images/prestitosi-calendario.png"
+                  />
                 </div>
-       
               </template>
             </Card>
           </div>
@@ -140,7 +225,7 @@
         </Card>
         <Card>
           <template #content>
-            <div class="w-full flex justify-content-between mb-4" >
+            <div class="w-full flex justify-content-between mb-4">
               <Button class="p-button-sm" label="Prestiti"></Button>
               <Button class="p-button-sm" label="Mutui"></Button>
               <Button class="p-button-sm" label="Cessioni"></Button>
@@ -168,11 +253,58 @@
       </div>
     </div>
   </div>
+  <div
+    class="w-full flex justify-content-around align-items-center flex-wrap footer-dashboard_2 mt-4"
+  >
+    <div class="logo-dashboard">
+      <img src="../assets/images/dash-logo-1.png" />
+    </div>
+    <div class="logo-dashboard">
+      <img src="../assets/images/dash-logo-2.png" />
+    </div>
+    <div class="logo-dashboard">
+      <img src="../assets/images/dash-logo-3.png" />
+    </div>
+    <div class="logo-dashboard">
+      <img src="../assets/images/dash-logo-4.png" />
+    </div>
+  </div>
+  <Dialog
+    v-model:visible="currentNotiziaVisible"
+    :style="{ width: '30vw', height: '100vh' }"
+    maximizable
+  >
+    <template #header>
+      <h4>{{ currentNotizia.titolo }}</h4>
+    </template>
+    <div v-html="currentNotizia.testo"></div>
+  </Dialog>
+  <Dialog
+    v-model:visible="currentCircolareVisible"
+    :style="{ width: '30vw', height: '100vh' }"
+    maximizable
+  >
+    <template #header>
+      <h4>{{ currentCircolare.titolo }}</h4>
+    </template>
+    <iframe
+      :src="currentCircolare.url"
+      frameBorder="0"
+      scrolling="auto"
+      width="100%"
+      height="95%"
+    ></iframe>
+  </Dialog>
 </template>
 
 <script setup>
-import { ref } from "vue";
-import AxiosService from "@/axiosServices/AxiosService";
+import { ref } from "vue"
+import AxiosService from "@/axiosServices/AxiosService"
+
+const loading = ref({
+  circolari: false,
+  notizie: false,
+})
 
 const responsiveOptions = ref([
   {
@@ -190,20 +322,43 @@ const responsiveOptions = ref([
     numVisible: 1,
     numScroll: 1,
   },
-]);
+])
 
-const notizie = ref([]);
-function getNotizie(){
-  const service = new AxiosService('News/GetList')
-  service.read().then(res => {
-    notizie.value = res
-  })
+const notizie = ref([])
+function getNotizie() {
+  console.log("ciao sono il get notizie")
+  loading.value.notizie = true
+  const service = new AxiosService("News/GetList")
+  service
+    .read()
+    .then((res) => {
+      notizie.value = res
+    })
+    .finally(() => {
+      loading.value.notizie = false
+    })
 }
 getNotizie()
 
-function truncate(str, n){
-  return (str.length > n) ? str.slice(0, n-1) + '...' : str;
-};
+function truncate(str, n) {
+  return str.length > n ? str.slice(0, n - 1) + "..." : str
+}
+
+const circolari = ref([])
+function getCircolari() {
+  loading.value.circolari = true
+  const service = new AxiosService("Circolari/GetCircolari")
+  service
+    .read()
+    .then((res) => {
+      circolari.value = res
+    })
+    .finally(() => {
+      loading.value.circolari = false
+    })
+}
+
+getCircolari()
 
 const ciambellaData = ref({
   labels: ["Compiuto", "Non compiuto"],
@@ -214,7 +369,7 @@ const ciambellaData = ref({
       hoverBackgroundColor: ["#0078e3", "#fdd87d"],
     },
   ],
-});
+})
 
 const ciambellaOptions = ref({
   plugins: {
@@ -224,7 +379,7 @@ const ciambellaOptions = ref({
       },
     },
   },
-});
+})
 
 const barreData = ref({
   labels: [
@@ -254,12 +409,12 @@ const barreData = ref({
       backgroundColor: "#fdd87d",
     },
   ],
-});
+})
 
 const barreOptions = ref({
   plugins: {
     legend: {
-      position: 'bottom',
+      position: "bottom",
       labels: {
         color: "#495057",
       },
@@ -283,7 +438,7 @@ const barreOptions = ref({
       },
     },
   },
-});
+})
 
 const tableData = ref([
   {
@@ -390,8 +545,23 @@ const tableData = ref([
     quattro: 0,
     ct: 2,
   },
-]);
+])
 
+const currentCircolare = ref()
+const currentCircolareVisible = ref(false)
+function apriCircolare(circolare) {
+  currentCircolareVisible.value = true
+  currentCircolare.value = circolare
+  currentCircolare.value.url =
+    "https://prestitosi-core.datarete.cloud/" + circolare.urlFile
+}
+
+const currentNotizia = ref()
+const currentNotiziaVisible = ref(false)
+function apriNotizia(notizia) {
+  currentNotiziaVisible.value = true
+  currentNotizia.value = notizia
+}
 </script>
 
 <style scoped lang="scss">
@@ -407,6 +577,3 @@ const tableData = ref([
   }
 }
 </style>
-
-
-

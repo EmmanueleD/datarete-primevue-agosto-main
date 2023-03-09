@@ -82,6 +82,17 @@ export default {
         )
         .then((res) => {
           if (res) {
+            res.menu.forEach((item) => {
+              item.items.forEach((subitem) => {
+                if (subitem.to.includes("https")) {
+                  subitem.command = () => {
+                    window.open(subitem.to2, "_blank")
+                  }
+                  delete subitem.to
+                  delete subitem.items
+                }
+              })
+            })
             this.menu = res.menu
           }
         })
@@ -94,6 +105,17 @@ export default {
         )
         .then((res) => {
           if (res) {
+            res.menu.forEach((item) => {
+              item.items.forEach((subitem) => {
+                if (subitem.to.includes("https")) {
+                  subitem.command = () => {
+                    window.open(subitem.to2, "_blank")
+                  }
+                  delete subitem.to
+                  delete subitem.items
+                }
+              })
+            })
             this.menu = res.menu
           }
         })

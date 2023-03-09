@@ -31,7 +31,6 @@
                 name="demo[]"
                 :customUpload="true"
                 :previewWidth="50"
-                :maxFileSize="1000000"
                 chooseLabel="Upload"
                 :auto="true"
                 :loading="loadingUpload"
@@ -59,66 +58,66 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
-import AxiosService from "@/axiosServices/AxiosService";
+import { ref } from "vue"
+import AxiosService from "@/axiosServices/AxiosService"
 
-const loadingUpload = ref(false);
-const loadingImport = ref(false);
+const loadingUpload = ref(false)
+const loadingImport = ref(false)
 
-const fileToUpload = ref();
+const fileToUpload = ref()
 
 function uploadFile2(ev) {
-  loadingUpload.value = true;
-  const service = new AxiosService("files");
+  loadingUpload.value = true
+  const service = new AxiosService("files")
   for (let i = 0; i < ev.files.length; i++) {
-    const formData = new FormData();
-    formData.append("file", ev.files[i]);
+    const formData = new FormData()
+    formData.append("file", ev.files[i])
     service
       .postCustomEndpoint("Upload?type=importatoreClient", "", formData)
       .then((res) => {
-        fileToUpload.value = res;
+        fileToUpload.value = res
       })
       .finally(() => {
-        loadingUpload.value = false;
-      });
+        loadingUpload.value = false
+      })
   }
 }
 
 function eseguiLImportazione() {
-  loadingImport.value = true;
+  loadingImport.value = true
   const serviceImportanzione = new AxiosService(
     "Import/ImportExcelLight/" + statiSelected.value
-  );
+  )
   serviceImportanzione
     .create({ filePath: fileToUpload.value })
     .then((res) => {
       if (res) {
-        console.log("importazione andato a buon fine");
+        console.log("importazione andato a buon fine")
       }
     })
     .catch((err) =>
       console.log("errore nel caricamento dell file nell'importatore")
     )
     .finally(() => {
-      loadingImport.value = false;
-    });
+      loadingImport.value = false
+    })
 }
 
 function downlodModelloLead() {
   window.open(
     "https://prestitosi-core.datarete.cloud/Drive/_COMMON/DataReteCore_ModelloLead.xlsx"
-  );
+  )
 }
 
-const statiOptions = ref([]);
-const statiSelected = ref(0);
+const statiOptions = ref([])
+const statiSelected = ref(0)
 
 function getStatiOptions() {
-  const service = new AxiosService("Options/StatiAnagrafiche/GetStati/0");
+  const service = new AxiosService("Options/StatiAnagrafiche/GetStati/0")
   service.read().then((res) => {
-    statiOptions.value = res;
-  });
+    statiOptions.value = res
+  })
 }
 
-getStatiOptions();
+getStatiOptions()
 </script>

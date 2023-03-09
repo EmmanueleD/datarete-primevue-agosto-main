@@ -568,7 +568,7 @@ const tipoRapportoOptions = [
 ]
 
 // PRESTITO
-const durataOptions = [12, 24, 36, 48, 60, 72, 84, 96, 108, 120]
+const durataOptions = [12, 24, 36, 48, 60, 72, 84, 96]
 const have_risultati = ref(true)
 const risultato = ref([])
 

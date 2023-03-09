@@ -14,12 +14,12 @@
         <div class="flex gap-2">
           <Button
             @click="showNuovaAnagrafica"
-            label="Crea un nuovo cliente"
+            label="Aggiungi nuovo richiedente"
             class="p-button-outlined"
           ></Button>
           <Button
             @click="showSelezionaClienteEsistente"
-            label="Seleziona un cliente esistente"
+            label="Seleziona anagrafica richiedente"
             class="p-button-outlined"
           ></Button>
         </div>
@@ -152,9 +152,9 @@
 
   <Card v-if="nuovaAnagraficaVisible">
     <template #content>
-      <NuovaAnagrafica
+      <NuovaAnagraficaSimplified
         @event_HideNuovaAnagrafica="addNuovoClienteToPratica($event)"
-      ></NuovaAnagrafica>
+      ></NuovaAnagraficaSimplified>
     </template>
   </Card>
 
@@ -314,10 +314,10 @@
 <script setup>
 import AxiosService from "@/axiosServices/AxiosService"
 import { ref, computed } from "vue"
-import NuovaAnagrafica from "@/components/sidebars/NuovaAnagrafica.vue"
 import { useRouter, useRoute } from "vue-router"
 import { useToast } from "primevue/usetoast"
 import { useConfirm } from "primevue/useconfirm"
+import NuovaAnagraficaSimplified from "../sidebars/NuovaAnagraficaSimplified.vue"
 
 const loading = ref(false)
 const router = useRouter()
@@ -379,12 +379,7 @@ function showElencoClienti() {
   elencoClientiVisible.value = true
 }
 
-const tipoPartecipanteOptions = ref([
-  "Mutuatario",
-  "Garante",
-  "Fideussore",
-  "Finanziatore",
-])
+const tipoPartecipanteOptions = ref(["Mutuatario", "Garante", "Fideussore"])
 
 const filtro = ref({
   cognome: "",

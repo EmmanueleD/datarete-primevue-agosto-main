@@ -5,7 +5,11 @@
         <i class="pi pi-bars hamburger-toggle" @click="onMenuToggle"></i>
       </div>
     </transition>
-    <span> <span class="fw-bold">Data Rete</span></span>
+    <span>
+      <span class="fw-bold cursor-pointer" @click="$router.push('/')"
+        >Data Rete</span
+      ></span
+    >
     <div class="ms-auto d-flex align-items-center">
       <div class="flex mr-4" v-if="userVoip">
         <!-- <i class="pi pi-circle-fill text-green-500 mr-2"></i> -->

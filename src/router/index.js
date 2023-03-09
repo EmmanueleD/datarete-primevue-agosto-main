@@ -44,6 +44,11 @@ const router = createRouter({
       component: AppLayout,
       children: [
         {
+          path: "profilo",
+          name: "ProfiloUtente",
+          component: () => import("@/views/ProfiloUtente.vue"),
+        },
+        {
           path: "/nuova-anagrafica/:idPratica",
           component: () => import("@/views/NuovaAnagrafica.vue"),
         },
@@ -461,6 +466,11 @@ const router = createRouter({
               name: "supporto-pratiche",
               component: () => import("@/views/supporto/Pratiche.vue"),
             },
+            {
+              path: "amministrazione",
+              name: "supporto-amministrazione",
+              component: () => import("@/views/supporto/Amministrazione.vue"),
+            },
           ],
         },
         {
@@ -491,6 +501,7 @@ const router = createRouter({
             },
             {
               path: "data-drive",
+              name: "DataDrive",
               component: () => import("@/views/plugins/DataDrive.vue"),
             },
             {

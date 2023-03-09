@@ -8,12 +8,14 @@
       :paginator="true"
       :rows="10"
       paginatorTemplate="CurrentPageReport FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink "
+      :resizableColumns="true"
       :scrollable="true"
       table-layout="auto"
       :loading="loading"
       dataKey="id"
       v-model:filters="filters"
       filterDisplay="menu"
+      :showFilterOperator="true"
     >
       <template #loading> Caricamento in corso... </template>
       <Column field="azioni" header="Azioni">
@@ -29,20 +31,45 @@
         :key="column.order"
         :field="column.field"
         :header="column.header"
+        :sortable="column.sortable"
+        :dataType="column.type"
       >
-        <template #filter="{ filterModel }">
+        <template #filter="{ filterModel, filterCallback }">
           <InputText
+            v-if="
+              column.field == 'Cliente' ||
+              column.field == 'Agente' ||
+              column.field == 'istitutoFinanziatore' ||
+              column.field == 'TipoProdotto' ||
+              column.field == 'Stato'
+            "
             type="text"
             v-model="filterModel.value"
             class="p-column-filter"
+            @change="filterCallback()"
           />
+          <Calendar
+            v-else-if="column.field == 'dataInserimento'"
+            v-model="filterModel.value"
+            dateFormat="dd/mm/yy"
+            @change="filterCallback()"
+          ></Calendar>
+          <InputNumber
+            v-else-if="
+              column.field == 'importo' ||
+              column.field == 'importoRata' ||
+              column.field == 'durata'
+            "
+            v-model="filterModel.value"
+            @change="filterCallback()"
+          ></InputNumber>
         </template>
         <template #body="{ data }">
-          <div class="w-full">
-            <span v-if="column.type == 'Date'">{{
+          <div class="w-full flex justify-content-start">
+            <span v-if="column.type == 'date'">{{
               new Date(data[column.field]).toLocaleDateString("it", {
                 year: "numeric",
-                month: "short",
+                month: "2-digit",
                 day: "2-digit",
                 hour: "2-digit",
                 minute: "2-digit",
@@ -62,6 +89,7 @@
 
             <span v-else>{{ data[column.field] }}</span>
             <!-- <span>{{ column }}</span> -->
+            <!-- {{ data[column.field] }} -->
           </div>
         </template>
       </Column>
@@ -83,7 +111,7 @@ const columns = [
     field: "Cliente",
     header: "Nome Cliente",
     visible: true,
-    type: "String",
+    type: "text",
     order: 1,
     frozen: true,
     sortable: true,
@@ -92,76 +120,77 @@ const columns = [
     field: "Agente",
     header: "Nome Agente",
     visible: true,
-    type: "String",
+    type: "text",
     order: 2,
     frozen: false,
-    sortable: false,
+    sortable: true,
   },
   {
     field: "dataInserimento",
     header: "Data Inserimento",
     visible: true,
-    type: "Date",
+    type: "date",
     order: 3,
     frozen: false,
-    sortable: false,
+    sortable: true,
   },
   {
     field: "importo",
     header: "Importo Richiesto",
     visible: true,
-    type: "Number",
+    type: "number",
     order: 4,
     frozen: false,
-    sortable: false,
+    sortable: true,
   },
   {
     field: "importoRata",
     header: "Importo Rata",
     visible: true,
-    type: "Number",
+    type: "number",
     order: 4,
     frozen: false,
-    sortable: false,
+    sortable: true,
   },
   {
     field: "istitutoFinanziatore",
     header: "Istituto Finanziatore",
     visible: true,
-    type: "String",
+    type: "text",
     order: 4,
     frozen: false,
-    sortable: false,
+    sortable: true,
   },
   {
     field: "TipoProdotto",
     header: "Tipo Prodotto",
     visible: true,
-    type: "String",
+    type: "text",
     order: 4,
     frozen: false,
-    sortable: false,
+    sortable: true,
   },
   {
     field: "durata",
     header: "Durata",
     visible: true,
-    type: "Number",
+    type: "number",
     order: 5,
     frozen: false,
-    sortable: false,
+    sortable: true,
   },
   {
     field: "Stato",
     header: "Ultimo Stato",
     visible: true,
-    type: "String",
+    type: "text",
     order: 6,
     frozen: false,
-    sortable: false,
+    sortable: true,
   },
 ]
 
+const tempFilterDate = ref()
 const tableItems = ref([])
 
 let pageTitle = ref("Bozze")
@@ -172,6 +201,10 @@ function getData() {
   service
     .create({})
     .then((res) => {
+      res.map((x) => {
+        x.dataInserimento = new Date(x.dataInserimento)
+      })
+
       tableItems.value = res
     })
     .finally(() => {
@@ -184,31 +217,84 @@ function apriDettaglioPratica(event) {
 }
 
 const filters = ref({
-  global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-  name: {
+  Cliente: {
     operator: FilterOperator.AND,
     constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }],
   },
-  "country.name": {
+  Agente: {
     operator: FilterOperator.AND,
     constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }],
   },
-  representative: { value: null, matchMode: FilterMatchMode.IN },
-  date: {
+  istitutoFinanziatore: {
+    operator: FilterOperator.AND,
+    constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }],
+  },
+  tipoProdotto: {
+    operator: FilterOperator.AND,
+    constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }],
+  },
+  Stato: {
+    operator: FilterOperator.AND,
+    constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }],
+  },
+  dataInserimento: {
     operator: FilterOperator.AND,
     constraints: [{ value: null, matchMode: FilterMatchMode.DATE_IS }],
   },
-  balance: {
+  importo: {
     operator: FilterOperator.AND,
     constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }],
   },
-  status: {
-    operator: FilterOperator.OR,
+  importoRata: {
+    operator: FilterOperator.AND,
     constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }],
   },
-  activity: { value: null, matchMode: FilterMatchMode.BETWEEN },
-  verified: { value: null, matchMode: FilterMatchMode.EQUALS },
+  durata: {
+    operator: FilterOperator.AND,
+    constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }],
+  },
 })
+
+function initFilters() {
+  filters.value = {
+    Cliente: {
+      operator: FilterOperator.AND,
+      constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }],
+    },
+    Agente: {
+      operator: FilterOperator.AND,
+      constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }],
+    },
+    istitutoFinanziatore: {
+      operator: FilterOperator.AND,
+      constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }],
+    },
+    tipoProdotto: {
+      operator: FilterOperator.AND,
+      constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }],
+    },
+    Stato: {
+      operator: FilterOperator.AND,
+      constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }],
+    },
+    dataInserimento: {
+      operator: FilterOperator.AND,
+      constraints: [{ value: null, matchMode: FilterMatchMode.DATE_IS }],
+    },
+    importo: {
+      operator: FilterOperator.AND,
+      constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }],
+    },
+    importoRata: {
+      operator: FilterOperator.AND,
+      constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }],
+    },
+    durata: {
+      operator: FilterOperator.AND,
+      constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }],
+    },
+  }
+}
 
 getData()
 </script>

@@ -49,21 +49,12 @@ export default {
     } else {
       this.isThisCrm = true
     }
-
-    this.$store.getters["loggedUser"].enabled_crm
-      ? (this.enabled_crm = true)
-      : (this.enabled_crm = false)
-    this.$store.getters["loggedUser"].enabled_gestionale
-      ? (this.enabled_gestionale = true)
-      : (this.enabled_gestionale = false)
   },
 
   data() {
     return {
       level_selected: 0,
       level_options: [],
-      enabled_crm: false,
-      enabled_gestionale: false,
       isThisCrm: false,
       isThisGest: false,
       accessoNonAbilitatoVisible: false,
@@ -73,8 +64,9 @@ export default {
   methods: {
     setLoginLevel() {
       if (
-        (this.isThisCrm && this.enabled_crm) ||
-        (this.isThisGest && this.enabled_crm)
+        (this.isThisCrm && this.$store.getters["loggedUser"].enabled_crm) ||
+        (this.isThisGest &&
+          this.$store.getters["loggedUser"].enabled_gestionale)
       ) {
         const service = new AxiosService("SetLoginLevel/" + this.level_selected)
         service

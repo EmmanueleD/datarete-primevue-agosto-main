@@ -1,6 +1,12 @@
 <template>
   <div class="wrapper">
-    <h1>Pratica: {{ id_pratica }}</h1>
+    <div class="flex justify-content-between align-items-center">
+      <h1>Pratica: {{ id_pratica }}</h1>
+      <Button
+        v-if="pratica.isBozza"
+        label="Inoltra pratica al Backoffice"
+      ></Button>
+    </div>
     <div class="grid">
       <div class="col-3">
         <Card>
@@ -139,9 +145,41 @@
               <TabPanel header="Dettagli">
                 <div class="grid">
                   <div class="col-12 flex justify-content-between flex-wrap">
-                    <div v-if="!loading" class="col flex flex-column mb-4">
+                    <div class="col-12 col-md-4 flex flex-column mb-4">
                       <label>Agente</label>
-                      <InputText v-model="pratica.Agente"> </InputText>
+                      <div v-if="loadingUtentiOptions" class="w-full pt-4">
+                        <Skeleton></Skeleton>
+                      </div>
+                      <Dropdown
+                        v-else
+                        :filter="true"
+                        v-model="pratica.idAgente"
+                        :options="utentiOptions"
+                        optionLabel="text"
+                        optionValue="value"
+                      ></Dropdown>
+                    </div>
+                    <div class="col-12 col-md-4 flex flex-column mb-4">
+                      <label>Collega</label>
+                      <div v-if="loadingUtentiOptions" class="w-full pt-4">
+                        <Skeleton></Skeleton>
+                      </div>
+                      <Dropdown
+                        v-else
+                        :filter="true"
+                        v-model="pratica.idAgenteCollega"
+                        :options="utentiOptions"
+                        optionLabel="text"
+                        optionValue="value"
+                      ></Dropdown>
+                    </div>
+                    <div class="col-12 col-md-2 flex flex-column mb-4">
+                      <label>% collega</label>
+                      <InputNumber
+                        v-model="pratica.percentualeCollega"
+                        :min-fraction-digits="0"
+                        :max-fraction-digits="2"
+                      ></InputNumber>
                     </div>
                     <div v-if="!loading" class="col flex flex-column mb-4">
                       <label>Cliente</label>
@@ -691,7 +729,26 @@ function sendRemoteChat() {
       remoteChat.value = ""
     })
 }
-
+const utentiOptions = ref([
+  {
+    text: "Nessun utente",
+    value: 0,
+  },
+])
+const loadingUtentiOptions = ref(false)
+function getUtentiOptions() {
+  loadingUtentiOptions.value = true
+  const service = new AxiosService("Options/GetUsers")
+  service
+    .read()
+    .then((res) => {
+      utentiOptions.value.push(...res)
+    })
+    .finally(() => {
+      loadingUtentiOptions.value = false
+    })
+}
+getUtentiOptions()
 getQuestoinariOptions()
 getQuestionari()
 getData()

@@ -159,14 +159,6 @@ h6 {
   place-content: center;
 }
 
-.scroller {
-  scroll-snap-type: y mandatory;
-}
-
-.scroller div {
-  scroll-snap-align: start;
-}
-
 .not-current {
   color: rgb(207, 207, 207);
 }
